@@ -28,8 +28,9 @@ static std::string file_content(std::string_view fname) {
 
     std::ifstream is = ifstream_open(fname.data());
     const std::size_t size = std::filesystem::file_size(fname);
-    std::string buffer(size, '\0');  // alloca stringa con spazio già riservato
-    is.read(&buffer[0], size);     // lettura diretta
+
+    std::string buffer(size, '\0');
+    is.read(&buffer[0], size);
     return buffer;
 }
 
@@ -58,13 +59,42 @@ per la stringa "BPPRRRRRRBPGRGPR" è giusto come huffman code
 // TODO: accettare un istream in decode
 // TODO: entropia di un file
 
+inline double probability(uint64_t frequency, uint64_t length) noexcept {
+    assert(length > 0);
+    return double(frequency) / length;
+}
+
+inline double self_information(double probability) noexcept {
+    assert(probability > 0);
+    return log2(1 / probability);
+}
+
 using namespace std;
 
 int main() {
 
     auto str = file_content("../data/divina_commedia.txt");
     //auto str = file_content("../data/lorem_ipsum.txt");
+    //auto str = std::string("il mio angolo di cielo e un triangolo di pelo");
+    //auto str = std::string("BPPRRRRRRBPGRGPR");
     Histogram freq{(uint8_t *)str.data(), str.length()};
+
+    // TODO: questo calcola la first order entropy che è approssimativa perchè non tiene conto delle dipendenze tra i simboli
+    //  quindi va bene con huffman che un modello a simboli indipendenti
+    double weighted_average = 0;
+    for (auto [sym, freq] : freq) {
+        cout << "s: " << sym << " f: " << freq << " p: " << probability(freq, str.length()) << '\n';
+        auto prob = probability(freq, str.length());
+        weighted_average += prob * self_information( prob );
+    }
+
+    double avg_bit_per_symbol = weighted_average;
+    double total_bits = weighted_average * str.length();
+
+    cout << "avg bit per symbol " << avg_bit_per_symbol << endl;
+    cout << "the file require at least bits: " << total_bits << " (" << uint64_t(ceil(total_bits / 8)) << " bytes)" << endl;
+
+    //return 0;
 
     auto tree = HuffmanTree(freq);
     auto shp_sym_tab = tree.symbol_table();

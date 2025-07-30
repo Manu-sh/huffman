@@ -7,7 +7,6 @@
 #include <bitarray/BitArray.hpp>
 #include <HuffmanNode.hpp>
 
-
 // TODO: disequazione di kraft mc millan
 // uint8_t bit_required = ceil(log2(pq.size()));
 // cout << "bit necessari / profondità albero: " << bit_required  << endl;
@@ -17,9 +16,6 @@
 std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root) {
 
     using HuffmanNode::CHILD_LEFT, HuffmanNode::CHILD_RIGHT, std::pair, std::vector; // C++20
-
-    // using std::pair, std::vector;
-    // constexpr auto CHILD_LEFT = HuffmanNode::CHILD_LEFT, CHILD_RIGHT = HuffmanNode::CHILD_RIGHT; // C++17
 
     std::forward_list<pair<const HuffmanNode *, BitArray>> open; // a stack
     auto shp_symbol_table = std::make_shared<vector<BitArray>>(256);

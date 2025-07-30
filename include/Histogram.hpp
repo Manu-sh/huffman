@@ -78,6 +78,10 @@ struct Histogram {
     const_iterator cbegin() const { return std::cbegin(*this); }
     const_iterator   cend() const { return std::cend(*this);   }
 
+    inline auto operator[](uint8_t symbol) const noexcept {
+        return m_frequency[ symbol ];
+    }
+
     private:
         uint32_t m_frequency[256] {};
 };

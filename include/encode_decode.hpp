@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <istream>
 #include <map>
 
 #include <bitarray/BitArray.hpp>
@@ -41,6 +40,8 @@ std::string decode(const std::vector<BitArray> &symbol_table, const BitArray &en
 
 // TODO: versione che usa input stream
 #if 0
+#include <istream>
+
 std::string decode(const std::vector<BitArray> &symbol_table, std::istream &bitstream) {
 
     std::map<std::string, uint8_t> dec_sym;
