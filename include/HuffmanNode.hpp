@@ -1,0 +1,82 @@
+#pragma once
+#include <cstdint>
+#include <cstring>
+
+#include <cctype>
+#include <cassert>
+#include <bitarray/BitArray.hpp>
+
+#include <sstream>
+#include <memory>
+
+struct HuffmanNode final {
+
+    friend std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root);
+
+    enum: uint8_t {
+        CHILD_LEFT,
+        CHILD_RIGHT,
+        CHILD_LEN
+    };
+
+    inline explicit HuffmanNode(const std::pair<uint8_t, uint32_t> &pair) noexcept: m_child{} { // construct an huffman node as leaf
+        leaf_data.symbol = pair.first;
+        leaf_data.freq   = pair.second;
+    }
+
+    // TODO: huffman ha problemi di overflow, dal momento che ogni nodo superiore costituisce la somma di altri 2 se 2 foglie fossero con frequenza altissima es. 2**32
+    //     i loro genitori su nella gerarchia possono mandare in overflow un uint64
+
+    inline explicit HuffmanNode(HuffmanNode *left, HuffmanNode* right) noexcept: m_child{left,right} { // construct an huffman node as subtree having n1 and n2 has child
+        assert(left && right);
+        freq_sum = left->freq() + right->freq(); // F = n1.freq + n2.freq
+    }
+
+    inline bool  is_leaf() const noexcept { return m_child[CHILD_LEFT] == m_child[CHILD_RIGHT]; } // nullptr == nullptr
+    inline uint64_t freq() const noexcept { return is_leaf() ? leaf_data.freq : freq_sum; }
+
+    std::string name() const {
+
+        if (!this->is_leaf())
+            return std::to_string(this->freq());
+
+        std::ostringstream os;
+        if (std::isalnum(this->leaf_data.symbol))
+            os << char(this->leaf_data.symbol);
+        else
+            os << (void*)(long)(this->leaf_data.symbol); // force 2hex conv
+
+        os << ':' << this->freq();
+        return os.str();
+    }
+
+
+    operator std::string() const {
+
+        if (this->is_leaf())
+            return this->name();
+
+        std::ostringstream os;
+        os << "[ " << this->freq() << " ] " << this << '\n'
+            << "  left:  "  << this->m_child[CHILD_LEFT]
+            << "  right:  " << this->m_child[CHILD_RIGHT]
+            << '\n';
+
+        return os.str();
+    }
+
+    protected:
+        // le foglie avranno certamente frequenza uint32 mentre gli altri nodi non avranno certamente symboli ma avranno frequenze uint64
+        HuffmanNode *m_child[CHILD_LEN];
+
+        // you don't need to store frequencies infos into a node since they are used only during the tree building phase,
+        // i do for debugging purpose and for accessing in O(1) during the tree-building
+        union {
+            uint64_t freq_sum;
+            struct {
+                uint32_t freq;
+                uint8_t symbol;
+            } leaf_data;
+        };
+
+};
