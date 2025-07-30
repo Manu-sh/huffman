@@ -8,7 +8,7 @@
 #include <cassert>
 #include <cstring>
 
-#include "common.hpp"
+#include "../common.hpp"
 #include "BitArray8.hpp"
 
 // TODO: reserve() and resize() method
@@ -62,6 +62,10 @@ public:
             m_bit_capacity{bytes_required(bit_length) * 8} // number of bit slots effectively available
         {
 
+        }
+
+        BitArray(const BitArray &o) {
+            this->operator=(o);
         }
 
         BitArray & operator=(const BitArray &o) {

@@ -1,13 +1,12 @@
 #pragma once
 #include <cstdint>
-#include <cstring>
-
 #include <cctype>
 #include <cassert>
 #include <bitarray/BitArray.hpp>
 
 #include <sstream>
 #include <memory>
+#include <vector>
 
 struct HuffmanNode final {
 
@@ -19,9 +18,9 @@ struct HuffmanNode final {
         CHILD_LEN
     };
 
-    inline explicit HuffmanNode(const std::pair<uint8_t, uint32_t> &pair) noexcept: m_child{} { // construct an huffman node as leaf
-        leaf_data.symbol = pair.first;
-        leaf_data.freq   = pair.second;
+    inline explicit HuffmanNode(uint8_t symbol, uint32_t frequency) noexcept: m_child{} { // construct an huffman node as leaf
+        leaf_data.symbol = symbol;
+        leaf_data.freq   = frequency;
     }
 
     // TODO: huffman ha problemi di overflow, dal momento che ogni nodo superiore costituisce la somma di altri 2 se 2 foglie fossero con frequenza altissima es. 2**32

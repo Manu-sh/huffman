@@ -12,27 +12,6 @@
 #include <cstdio>
 #include <vector>
 #include <cmath>
-#include <fstream>
-#include <filesystem>
-
-static const auto &ifstream_open = [](const char *filename) -> std::ifstream {
-    using std::literals::string_literals::operator""s, std::ios_base;
-    std::ifstream fpnm;
-    fpnm.exceptions(ios_base::badbit);
-    fpnm.open(filename, ios_base::in|ios_base::binary);
-    if (!fpnm) throw std::invalid_argument{"Unable to open file: "s + filename};
-    return fpnm;
-};
-
-static std::string file_content(std::string_view fname) {
-
-    std::ifstream is = ifstream_open(fname.data());
-    const std::size_t size = std::filesystem::file_size(fname);
-
-    std::string buffer(size, '\0');
-    is.read(&buffer[0], size);
-    return buffer;
-}
 
 
 /*
@@ -56,7 +35,6 @@ per la stringa "BPPRRRRRRBPGRGPR" è giusto come huffman code
 
 */
 
-// TODO: accettare un istream in decode
 // TODO: entropia di un file
 
 inline double probability(uint64_t frequency, uint64_t length) noexcept {
@@ -73,10 +51,10 @@ using namespace std;
 
 int main() {
 
-    auto str = file_content("../data/divina_commedia.txt");
+    //auto str = file_content("../data/divina_commedia.txt");
     //auto str = file_content("../data/lorem_ipsum.txt");
     //auto str = std::string("il mio angolo di cielo e un triangolo di pelo");
-    //auto str = std::string("BPPRRRRRRBPGRGPR");
+    auto str = std::string("BPPRRRRRRBPGRGPR");
     Histogram freq{(uint8_t *)str.data(), str.length()};
 
     // TODO: questo calcola la first order entropy che è approssimativa perchè non tiene conto delle dipendenze tra i simboli

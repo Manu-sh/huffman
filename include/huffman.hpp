@@ -28,7 +28,7 @@ std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *roo
 
     for (open.push_front({root, BitArray{}}); !open.empty();) {
 
-        auto [node, path] = open.front(); // path is a list of edges in binary
+        auto [node, path] = open.front(); // path is a list of edges in binary (left=0, right=1)
         open.pop_front();
 
         if (node->is_leaf()) {

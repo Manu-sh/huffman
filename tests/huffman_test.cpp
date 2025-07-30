@@ -1,6 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest/doctest.h>
 
+#include <common.hpp>
 #include <encode_decode.hpp>
 #include <HuffmanTree.hpp>
 #include <Histogram.hpp>
@@ -35,6 +36,7 @@ TEST_CASE("testing huffman on strings") {
     try_decode("abccdddeeeeeffffffffggggggggggggghhhhhhhhhhhhhhhhhhhhh");
     try_decode("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbccccccccccccddddddddddddddddddddddddeeeeeeeeefffff");
 
+    //try_decode(file_content("../../data/divina_commedia.txt"));
 }
 
 int main(int argc, char *argv[]) {
