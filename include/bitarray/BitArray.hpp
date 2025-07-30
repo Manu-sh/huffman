@@ -64,18 +64,17 @@ public:
 
         }
 
-        BitArray(const BitArray &o): BitArray(1) {
-            this->operator=(o);
-        }
-
         BitArray & operator=(const BitArray &o) {
 
             // i have not time 4 a full implementation
             assert(&o != this);
             assert(&(o.m_vct) != &(this->m_vct));;
 
-            this->clear();
-            this->operator+=(o);
+            m_vct.resize(o.m_vct.size());
+            //memcpy(m_vct.data(), o.m_vct.data(), o.m_vct.size());
+            memcpy(m_vct.data(), o.m_vct.data(), o.effective_byte_size());
+            m_bit_capacity = o.m_bit_capacity;
+            m_bit_idx = o.m_bit_idx;
             return *this;
         }
 
@@ -97,13 +96,15 @@ public:
         bool operator[](uint64_t i) const {
             assert(i < m_bit_capacity);
             const auto byte_idx = i >> 3; // (i/8)
-            const BitArray8 &bit_a = m_vct.at(byte_idx);
+            //const BitArray8 &bit_a = m_vct.at(byte_idx);
+            const BitArray8 &bit_a = m_vct[byte_idx];
             return bit_a[i&7]; // i%8
         }
 
         void operator()(uint64_t i, bool value) {
             const auto byte_idx = i >> 3; // (i/8)
-            BitArray8 &bit_a = m_vct.at(byte_idx);
+            //BitArray8 &bit_a = m_vct.at(byte_idx);
+            BitArray8 &bit_a = m_vct[byte_idx];
             return (void)bit_a(i&7, value); // i%8
         }
 
@@ -250,8 +251,12 @@ BitArray & BitArray::operator+=(const BitArray &o) {
         return *this;
     }
 
-    for (bool bit : o) this->push_back(bit);
+    //for (bool bit : o) this->push_back(bit);
+    for (uint64_t i = 0, len = o.bit_length(); i < len; ++i)
+        this->push_back(o[i]);
+
     return *this;
 }
+
 
 static_assert(std::bidirectional_iterator<BitArray::BitArrayIterator>);

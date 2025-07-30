@@ -15,16 +15,16 @@
 #include <fstream>
 #include <filesystem>
 
-static std::string file_content(std::string_view fname) {
+static const auto &ifstream_open = [](const char *filename) -> std::ifstream {
+    using std::literals::string_literals::operator""s, std::ios_base;
+    std::ifstream fpnm;
+    fpnm.exceptions(ios_base::badbit);
+    fpnm.open(filename, ios_base::in|ios_base::binary);
+    if (!fpnm) throw std::invalid_argument{"Unable to open file: "s + filename};
+    return fpnm;
+};
 
-    static const auto &ifstream_open = [](const char *filename) -> std::ifstream {
-        using std::literals::string_literals::operator""s, std::ios_base;
-        std::ifstream fpnm;
-        fpnm.exceptions(ios_base::badbit);
-        fpnm.open(filename, ios_base::in|ios_base::binary);
-        if (!fpnm) throw std::invalid_argument{"Unable to open file: "s + filename};
-        return fpnm;
-    };
+static std::string file_content(std::string_view fname) {
 
     std::ifstream is = ifstream_open(fname.data());
     const std::size_t size = std::filesystem::file_size(fname);

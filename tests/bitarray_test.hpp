@@ -264,3 +264,9 @@ TEST_CASE("testing bitarray::pop_back()") {
     }
 
 }
+
+/*
+TEST_CASE("testing bitarray::push_back()") {
+
+
+}*/
