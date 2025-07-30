@@ -13,6 +13,9 @@
 
 // TODO: reserve() and resize() method
 
+// TODO: avere effective_byte_size() sempre ad almeno 1 semplificherebbe molto l'arimentica
+//   usare empty per determinare se è il caso di skippare la copia probabilmente va riscritta poi la parte memcpy e aggiornati i test
+
 struct BitArray {
 
     // es. 9 bit requires 2 byte -> byte_required(9) -> 2
