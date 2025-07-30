@@ -44,7 +44,6 @@ per la stringa "BPPRRRRRRBPGRGPR" è giusto come huffman code
 'R'  | 0
 
 
-
 'a'  | 1111110
 'b'  | 1111111
 'c'  | 111110
@@ -55,13 +54,6 @@ per la stringa "BPPRRRRRRBPGRGPR" è giusto come huffman code
 'h'  | 0
 
 */
-
-//std::string str{"il mio angolo di cielo e un triangolo di pelo"};
-//std::string str{"aaaaabbbbbbbbbccccccccccccdddddddddddddeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffffff"};
-//std::string str{"\x1dmiao miao miao miaooo"};
-//std::string str{"BPPRRRRRRBPGRGPR"};
-//std::string str{"abccdddeeeeeffffffffggggggggggggghhhhhhhhhhhhhhhhhhhhh"};
-//std::string str{"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbccccccccccccddddddddddddddddddddddddeeeeeeeeefffff"};
 
 // TODO: accettare un istream in decode
 // TODO: entropia di un file
