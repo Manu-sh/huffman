@@ -268,7 +268,6 @@ TEST_CASE("testing bitarray::pop_back()") {
 
 TEST_CASE("testing bitarray::=operator(const BitArray&)") {
 
-
     {
         const BitArray src{128};
         BitArray dst;
@@ -304,8 +303,32 @@ TEST_CASE("testing bitarray::=operator(const BitArray&)") {
         REQUIRE(dst.last_bit_idx() == 32);
 
         for (int i = 0; i < 33; ++i)
-            REQUIRE(dst[i] == 1);
+            REQUIRE(dst[i] == src[i]);
     }
 
 
+}
+
+
+TEST_CASE("testing bitarray::+=operator(const BitArray&)") {
+    {
+        BitArray src{128};
+        for (int i = 0; i < 33; ++i)
+            src.push_back(1);
+
+        BitArray dst;
+        dst += src;
+        dst += src;
+
+        REQUIRE(dst.bit_capacity() >= 33*2);
+        REQUIRE(dst.bit_length() == 33*2);
+        REQUIRE(dst.last_bit_idx() == 33*2-1);
+
+        REQUIRE(dst.last_element_byte_idx() == 8);
+        REQUIRE(dst.effective_byte_size() == 9);
+
+        for (int i = 0; i < dst.bit_length(); ++i)
+            REQUIRE(dst[i] == 1);
+
+    }
 }
