@@ -10,7 +10,7 @@
 
 ##### Special Thanks
 
-A special thanks to Bill Bird from the University of Victoria (Canada), 
+A special thanks to [Bill Bird](https://github.com/billbird) from the University of Victoria (Canada), 
 who has shared on YouTube his wonderful video playlist on compression algorithms.
 I loved the clarity and detail and the passion of his explanations. 
 
