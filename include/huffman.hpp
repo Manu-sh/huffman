@@ -13,6 +13,8 @@
 // BitArray bvct{bit_required};
 
 // compute a prefix free code using iterative dfs subtree in pre-order
+// return an array of 256 elements in which every element is a BitArray
+// vector<bits>[256] -> map[sym] = huffman_code
 std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root) {
 
     using HuffmanNode::CHILD_LEFT, HuffmanNode::CHILD_RIGHT, std::pair, std::vector; // C++20

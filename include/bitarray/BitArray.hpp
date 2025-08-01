@@ -166,6 +166,8 @@ public:
         const_iterator cbegin() const;
         const_iterator   cend() const;
 
+        inline const void * bitstream() const { return m_vct.data(); }
+
         protected:
             std::vector<BitArray8> m_vct; // used as memory block
             uint64_t m_bit_idx{}; // index where insert the next value, when array created = 0
