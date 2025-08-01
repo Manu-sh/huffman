@@ -3,20 +3,19 @@
 
 Example of format
 
-(all integers in little endian)
+All integers in little endian:
 
-uint8_t magic[] 0x4d, 0x61, 0x6e, 0x75 }; 
+`uint8_t magic[] { 0x4d, 0x61, 0x6e, 0x75 };` 
 
-uint8_t reserved[128]
-uint32_t length of symbol table
+`uint8_t reserved[16]`
+
+`uint32_t length` of symbol table
 
 | uint8_t | uint16_t | uint8_t[]  |
 ----------|----------|-------------
 | symbol  | length   | prefix code|
 
 bitstream..
-
-....
 
 
 ##### Learning resources

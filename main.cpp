@@ -9,6 +9,9 @@
 #include <Histogram.hpp>
 #include <bitarray/BitArray.hpp>
 
+#include <hafe_file_format/HafeHeader.hpp>
+#include <hafe_file_format/HafeSymbolTable.hpp>
+
 #include <cstdio>
 #include <vector>
 #include <cmath>
