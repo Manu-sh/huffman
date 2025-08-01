@@ -120,7 +120,7 @@ public:
             );
         }
 
-        void push_back(bool value) {
+        BitArray & push_back(bool value) {
 
             if (m_bit_idx >= m_bit_capacity-1) {
                 m_vct.push_back({}); // attach a new 8 bit chunk
@@ -128,6 +128,7 @@ public:
             }
 
             this->operator()(m_bit_idx++, value); // insert the value and point at the next bit
+            return *this;
         }
 
         // TODO: ogni tanto è opportuno fare shrink del vector sottostante se m_vct.size() è molto grande rispetto a this->bit_size() / 8

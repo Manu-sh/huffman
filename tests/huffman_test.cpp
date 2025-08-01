@@ -14,6 +14,7 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 #include "bitarray_test.hpp"
+#include "hafe_test.hpp"
 
 using namespace std;
 

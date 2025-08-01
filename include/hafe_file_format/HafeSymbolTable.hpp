@@ -8,7 +8,7 @@ extern "C" {
 #include <bitarray/BitArray.hpp>
 
 /*
-    | uint8_t | uint16_t   | uint8_t[]  |
+    | uint8_t | uint16_t         | uint8_t[]   |
     ----------|------------------|-------------
     | symbol  | bit_length(code) | prefix code |
 
@@ -34,6 +34,7 @@ struct HafeSymbolTable {
 // TODO: nel caso di una lettura del file da disco sarà sempre little endian, nel caso della scrittura invece no
 
 struct HafeSymbolTableDiskWriter: protected HafeSymbolTable {
+
     using HafeSymbolTable::HafeSymbolTable;
 
     static uint32_t calc_symbol_table_disk_size(const std::vector<BitArray> &symbol_table) {
