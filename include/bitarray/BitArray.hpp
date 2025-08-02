@@ -24,28 +24,26 @@ struct BitArray {
         return ceil_div(bits, 8);
     }
 
-    public:
-        // effective_byte_size() -> return in which byte is stored the latest bit 0 if none
-        // so DONT write m_vct[effective_byte_size()-1]
-        // the underlying container (vector) can be bigger than the actual byte size
-        inline uint64_t effective_byte_size() const noexcept {
-            return bit_length() == 0 ? 0 : bytes_required(bit_length());
-        }
+    // effective_byte_size() -> return in which byte is stored the latest bit 0 if none
+    // so DONT write m_vct[effective_byte_size()-1]
+    // the underlying container (vector) can be bigger than the actual byte size
+    inline uint64_t effective_byte_size() const noexcept {
+        return bit_length() == 0 ? 0 : bytes_required(bit_length());
+    }
 
-        // last_element_byte_idx() -> m_vct[ last_element_byte_idx() ] always is valid
-        inline uint64_t last_element_byte_idx() const noexcept {
+    // last_element_byte_idx() -> m_vct[ last_element_byte_idx() ] always is valid
+    inline uint64_t last_element_byte_idx() const noexcept {
 
-            // m_bit_idx point to the next unused bit
-            // if we have 8 bit stored his value is 8 but the last element is stored into this[7]
+        // m_bit_idx point to the next unused bit
+        // if we have 8 bit stored his value is 8 but the last element is stored into this[7]
 
-           return effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
-        }
+       return effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
+    }
 
-        FORCED(inline) uint64_t last_bit_idx() const noexcept {
-            return m_bit_idx - (m_bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
-        }
+    FORCED(inline) uint64_t last_bit_idx() const noexcept {
+        return m_bit_idx - (m_bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
+    }
 
-public:
 
     struct BitArrayIterator; // forward declaration
 
@@ -55,119 +53,150 @@ public:
     using reference       = value_type &;
     using const_iterator  = BitArrayIterator;
 
+    explicit BitArray(uint32_t bit_length = 1):
+        m_vct(bytes_required(bit_length)),
+        m_bit_capacity{bytes_required(bit_length) * 8} // number of bit slots effectively available
+    {
 
-    public:
-        explicit BitArray(uint32_t bit_length = 1):
-            m_vct(bytes_required(bit_length)),
-            m_bit_capacity{bytes_required(bit_length) * 8} // number of bit slots effectively available
-        {
+    }
 
+    explicit BitArray(BitArray8 *vct, uint64_t byte_length, uint64_t bit_length) {
+
+        // required_bytes can be < byte_length the user can provide a bigger chunk and ask to read only few bits
+        // but the user can also ask to read 23 bits which require 3 bytes ceil(bits / 8)
+        uint64_t required_bytes = bytes_required(bit_length);
+        assert(required_bytes <= byte_length);
+        /*if (required_bytes <= byte_length)
+            throw std::runtime_error{"wait... what?"}*/
+
+        m_vct.resize(required_bytes);
+        memcpy(m_vct.data(), vct, required_bytes);
+
+        m_bit_capacity = required_bytes << 3; // required_bytes * 8
+        m_bit_idx = bit_length;
+    }
+
+    explicit BitArray(std::vector<BitArray8> &&moveable_vector, uint64_t bit_length) {
+
+        // required_bytes can be < byte_length the user can provide a bigger chunk and ask to read only few bits
+        // but the user can also ask to read 23 bits which require 3 bytes ceil(bits / 8)
+        uint64_t required_bytes = bytes_required(bit_length);
+        assert(required_bytes <= moveable_vector.size());
+        /*if (required_bytes <= byte_length)
+            throw std::runtime_error{"wait... what?"}*/
+
+        m_vct = std::move(moveable_vector);
+        //m_vct.resize(required_bytes); // this doesnt trigger realloc() and subsequent push_back() only will trigger realloc() to make more space
+
+        m_bit_capacity = m_vct.size() << 3; // size() * 8
+        m_bit_idx = bit_length;
+    }
+
+    BitArray(const BitArray &o) {
+        this->operator=(o);
+    }
+
+    BitArray & operator=(const BitArray &o) {
+
+        // i have not time 4 a full implementation
+        assert(&o != this);
+        assert(&(o.m_vct) != &(this->m_vct));;
+
+        m_vct.resize(o.m_vct.size());
+        //memcpy(m_vct.data(), o.m_vct.data(), o.m_vct.size());
+        memcpy(m_vct.data(), o.m_vct.data(), o.effective_byte_size());
+        m_bit_capacity = o.m_bit_capacity;
+        m_bit_idx = o.m_bit_idx;
+        return *this;
+    }
+
+    BitArray & operator+=(const BitArray &o);
+
+    inline uint64_t bit_length()   const noexcept { return m_bit_idx;         } // bits you have pushed with push function
+    inline uint64_t bit_capacity() const noexcept { return m_bit_capacity;    } // in this container bit_capacity()-1 is always accessible, this value is at least 1
+    inline     bool empty()        const noexcept { return !m_bit_idx;        }
+
+    inline void clear() {
+
+        m_vct.clear();
+        m_vct.resize(1);
+
+        m_bit_idx = 0;
+        m_bit_capacity = bytes_required(1) * 8;
+    }
+
+    bool operator[](uint64_t i) const {
+        assert(i < m_bit_capacity);
+        const auto byte_idx = i >> 3; // (i/8)
+        //const BitArray8 &bit_a = m_vct.at(byte_idx);
+        const BitArray8 &bit_a = m_vct[byte_idx];
+        return bit_a[i&7]; // i%8
+    }
+
+    void operator()(uint64_t i, bool value) {
+        const auto byte_idx = i >> 3; // (i/8)
+        //BitArray8 &bit_a = m_vct.at(byte_idx);
+        BitArray8 &bit_a = m_vct[byte_idx];
+        return (void)bit_a(i&7, value); // i%8
+    }
+
+    bool back() const { // if is_empty() calling back() result in UB and is your fault
+        assert(!empty());
+        return this->operator[](
+                //m_bit_idx - (m_bit_idx != 0) // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
+                last_bit_idx()
+        );
+    }
+
+    BitArray & push_back(bool value) {
+
+        if (m_bit_idx >= m_bit_capacity-1) {
+            m_vct.push_back({}); // attach a new 8 bit chunk
+            m_bit_capacity = m_vct.size() << 3; // size() * 8 //m_bit_length += 8;
         }
 
-        BitArray(const BitArray &o) {
-            this->operator=(o);
-        }
+        this->operator()(m_bit_idx++, value); // insert the value and point at the next bit
+        return *this;
+    }
 
-        BitArray & operator=(const BitArray &o) {
-
-            // i have not time 4 a full implementation
-            assert(&o != this);
-            assert(&(o.m_vct) != &(this->m_vct));;
-
-            m_vct.resize(o.m_vct.size());
-            //memcpy(m_vct.data(), o.m_vct.data(), o.m_vct.size());
-            memcpy(m_vct.data(), o.m_vct.data(), o.effective_byte_size());
-            m_bit_capacity = o.m_bit_capacity;
-            m_bit_idx = o.m_bit_idx;
-            return *this;
-        }
-
-        BitArray & operator+=(const BitArray &o);
-
-        inline uint64_t bit_length()   const noexcept { return m_bit_idx;         } // bits you have pushed with push function
-        inline uint64_t bit_capacity() const noexcept { return m_bit_capacity;    } // in this container bit_capacity()-1 is always accessible, this value is at least 1
-        inline     bool empty()        const noexcept { return !m_bit_idx;        }
-
-        inline void clear() {
-
-            m_vct.clear();
-            m_vct.resize(1);
-
-            m_bit_idx = 0;
-            m_bit_capacity = bytes_required(1) * 8;
-        }
-
-        bool operator[](uint64_t i) const {
-            assert(i < m_bit_capacity);
-            const auto byte_idx = i >> 3; // (i/8)
-            //const BitArray8 &bit_a = m_vct.at(byte_idx);
-            const BitArray8 &bit_a = m_vct[byte_idx];
-            return bit_a[i&7]; // i%8
-        }
-
-        void operator()(uint64_t i, bool value) {
-            const auto byte_idx = i >> 3; // (i/8)
-            //BitArray8 &bit_a = m_vct.at(byte_idx);
-            BitArray8 &bit_a = m_vct[byte_idx];
-            return (void)bit_a(i&7, value); // i%8
-        }
-
-        bool back() const { // if is_empty() calling back() result in UB and is your fault
-            assert(!empty());
-            return this->operator[](
-                    //m_bit_idx - (m_bit_idx != 0) // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
-                    last_bit_idx()
-            );
-        }
-
-        BitArray & push_back(bool value) {
-
-            if (m_bit_idx >= m_bit_capacity-1) {
-                m_vct.push_back({}); // attach a new 8 bit chunk
-                m_bit_capacity = m_vct.size() << 3; // size() * 8 //m_bit_length += 8;
-            }
-
-            this->operator()(m_bit_idx++, value); // insert the value and point at the next bit
-            return *this;
-        }
-
-        // TODO: ogni tanto è opportuno fare shrink del vector sottostante se m_vct.size() è molto grande rispetto a this->bit_size() / 8
-        void pop_back() {
-            assert(!empty());
-            --m_bit_idx;
-        }
+    // TODO: ogni tanto è opportuno fare shrink del vector sottostante se m_vct.size() è molto grande rispetto a this->bit_size() / 8
+    //  ma bit_capacity()-1 dovrà rimanere sempre accessibile inoltre dovrà sempre avere almeno 1 byte
+    void pop_back() {
+        assert(!empty());
+        --m_bit_idx;
+    }
 
 
-        operator std::string() const {
+    operator std::string() const {
 
-            std::ostringstream oss;
-            for (uint64_t i = 0; i < this->bit_length(); ++i)
-                oss << char(this[0][i] + '0');
+        std::ostringstream oss;
+        for (uint64_t i = 0; i < this->bit_length(); ++i)
+            oss << char(this[0][i] + '0');
 
-            return oss.str();
-        }
+        return oss.str();
+    }
 
-        std::string str() const {
-            return std::string{*this};
-        }
+    std::string str() const {
+        return std::string{*this};
+    }
 
-        /*
-        void reserve(uint64_t bit_length) {
+    /*
+    void reserve(uint64_t bit_length) {
 
-            auto byte_length = ceil_div(bit_length, 8);
-            if (bit_length <= bit_length())
-                return;
+        auto byte_length = ceil_div(bit_length, 8);
+        if (bit_length <= bit_length())
+            return;
 
-            m_vct->reserve( bytes );
-            m_bit_capacity = bit_length;
-        }*/
+        m_vct->reserve( bytes );
+        m_bit_capacity = bit_length;
+    }*/
 
-        const_iterator begin() const;
-        const_iterator   end() const;
-        const_iterator cbegin() const;
-        const_iterator   cend() const;
+    const_iterator begin() const;
+    const_iterator   end() const;
+    const_iterator cbegin() const;
+    const_iterator   cend() const;
 
-        inline const void * bitstream() const { return m_vct.data(); }
+    inline const void * bitstream() const { return m_vct.data(); }
 
         protected:
             std::vector<BitArray8> m_vct; // used as memory block

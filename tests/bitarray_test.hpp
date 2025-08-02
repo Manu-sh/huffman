@@ -2,11 +2,13 @@
 #include <doctest/doctest.h>
 
 #include <bitarray/BitArray.hpp>
+#include <bitarray/BitArray8.hpp>
 
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <iostream>
 #include <string>
 #include <cstdint>
+#include <memory>
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 using namespace std;
@@ -310,7 +312,7 @@ TEST_CASE("testing bitarray::=operator(const BitArray&)") {
 }
 
 
-TEST_CASE("testing bitarray::+=operator(const BitArray&)") {
+TEST_CASE("testing concat bitarray::+=operator(const BitArray&)") {
     {
         BitArray src{128};
         for (int i = 0; i < 33; ++i)
@@ -331,4 +333,98 @@ TEST_CASE("testing bitarray::+=operator(const BitArray&)") {
             REQUIRE(dst[i] == 1);
 
     }
+}
+
+
+
+TEST_CASE("testing explicit BitArray(BitArray8 *vct, uint64_t byte_length, uint64_t bit_length)") {
+
+    {
+
+        auto byte_len = 3;
+        auto shp_bit_a8 = std::make_shared<BitArray8[]>(3); // 24 bit
+        BitArray8 *vct8 = shp_bit_a8.get();
+
+        // set 24 bit to 1
+        for (int i = 0; i < byte_len; ++i) {
+            BitArray8 &el = vct8[i];
+            for (int b = 0; b < 8; ++b)
+                el(b, 1);
+        }
+
+        { // read all 24 bits
+            BitArray dst(vct8, byte_len, 24);
+
+            REQUIRE(dst.effective_byte_size() == 3);
+            REQUIRE(dst.bit_capacity() == 24);
+            REQUIRE(dst.bit_length() == 24);
+            REQUIRE(dst.last_bit_idx() == 23);
+
+            for (int i = 0; i < dst.bit_length(); ++i)
+                REQUIRE(dst[i] == 1);
+        }
+
+
+        { // read only 3 bits
+            BitArray dst(vct8, byte_len, 3);
+
+            REQUIRE(dst.effective_byte_size() == 1);
+            REQUIRE(dst.bit_capacity() == 8);
+            REQUIRE(dst.bit_length() == 3);
+            REQUIRE(dst.last_bit_idx() == 2);
+
+            for (int i = 0; i < dst.bit_length(); ++i)
+                REQUIRE(dst[i] == 1);
+        }
+
+
+    }
+
+}
+
+TEST_CASE("testing explicit BitArray(vector<BitArray8>&&, uint64_t bits)") {
+
+    {
+        std::vector<BitArray8> bit_stream(3); // 24 bit
+        for (int i = 0; i < bit_stream.size(); ++i) {
+            BitArray8 &el = bit_stream[i];
+            for (int b = 0; b < 8; ++b)
+                el(b, 1);
+        }
+
+        BitArray dst{std::move(bit_stream), 24}; // move ownership
+
+        REQUIRE(dst.effective_byte_size() == 3);
+        REQUIRE(dst.bit_capacity() == 24);
+        REQUIRE(dst.bit_length() == 24);
+        REQUIRE(dst.last_bit_idx() == 23);
+
+        for (int i = 0; i < dst.bit_length(); ++i)
+            REQUIRE(dst[i] == 1);
+
+        // once moved you cannot use anymore
+    }
+
+    {
+        std::vector<BitArray8> bit_stream(3); // 24 bit
+        for (int i = 0; i < bit_stream.size(); ++i) {
+            BitArray8 &el = bit_stream[i];
+            for (int b = 0; b < 8; ++b)
+                el(b, 1);
+        }
+
+        BitArray dst{std::move(bit_stream), 3}; // move ownership
+
+        REQUIRE(dst.effective_byte_size() == 1);
+        REQUIRE(dst.bit_capacity() == 24); // i may change this behavior later to be dst.bit_capacity() == 8
+        REQUIRE(dst.bit_length() == 3);
+        REQUIRE(dst.last_bit_idx() == 2);
+
+        for (int i = 0; i < dst.bit_length(); ++i)
+            REQUIRE(dst[i] == 1);
+
+        // once moved you cannot use anymore
+    }
+
+
 }

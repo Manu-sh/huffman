@@ -18,6 +18,8 @@ All integers in little endian:
 bitstream..
 
 
+Maybe a crc will be added later there is some space reserved.
+
 ##### Learning resources
 - https://huffman-coding-online.vercel.app
 - https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1234/resources/huffman.html

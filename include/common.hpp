@@ -25,6 +25,7 @@ static std::ifstream ifstream_open(const char *filename) {
     using std::literals::string_literals::operator""s, std::ios_base;
     std::ifstream fpnm;
     fpnm.exceptions(ios_base::badbit);
+    //fpnm.exceptions(ios_base::badbit|ios_base::failbit);
     fpnm.open(filename, ios_base::in|ios_base::binary);
     if (!fpnm) throw std::invalid_argument{"Unable to open file: "s + filename};
     return fpnm;
