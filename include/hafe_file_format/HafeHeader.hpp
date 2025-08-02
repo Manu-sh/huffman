@@ -7,6 +7,9 @@ extern "C" {
 // Huffman Archive Format Example .hafe (all integers in little endian)
 struct __attribute__((__packed__)) HafeHeader {
 
+    HafeHeader() = delete;
+    HafeHeader(uint32_t symbol_table_size): m_symbol_table_bsize{htole32(symbol_table_size)} {}
+
     uint32_t symbol_table_bsize() const noexcept { return le32toh(m_symbol_table_bsize); }
     HafeHeader & symbol_table_bsize(uint32_t bsize) noexcept { return m_symbol_table_bsize = htole32(bsize), *this; }
 

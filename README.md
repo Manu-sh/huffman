@@ -15,10 +15,13 @@ All integers in little endian:
 ----------|----------|-------------
 | symbol  | length   | prefix code|
 
+
+`uint8_t last_byte_garbage_bits` stream_size % 2**8, a compact way to express bitstream length since can be very long and it contains garbage at the end in the last byte (padding bits). 
+
 bitstream..
 
-
 Maybe a crc will be added later there is some space reserved.
+
 
 ##### Learning resources
 - https://huffman-coding-online.vercel.app
