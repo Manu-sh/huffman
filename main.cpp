@@ -7,6 +7,7 @@
 #include <encode_decode.hpp>
 #include <HuffmanTree.hpp>
 #include <Histogram.hpp>
+#include <ShannonHistogram.hpp>
 #include <bitarray/BitArray.hpp>
 
 #include <hafe_file_format/Hafe.hpp>
@@ -37,47 +38,26 @@ per la stringa "BPPRRRRRRBPGRGPR" è giusto come huffman code
 
 */
 
-// TODO: entropia di un file
-
-inline double probability(uint64_t frequency, uint64_t length) noexcept {
-    assert(length > 0);
-    return double(frequency) / length;
-}
-
-inline double self_information(double probability) noexcept {
-    assert(probability > 0);
-    return log2(1 / probability);
-}
-
 using namespace std;
 
 int main() {
 
-
-    // TODO: creare una class X <: Histogram contenente anche le stat e renderla implicitamente convertibile a Histogram
+    // creare una class X <: Histogram contenente anche le stat implicitamente convertibile a Histogram
+    // TODO: creare una class SymbolTable <: std::vector<BitArray> contenente anche le stat e renderla implicitamente convertibile a std::vector<BitArray>
+    // TODO: aggiungere le stat di compressione in Hafe (?)
 
     //auto str = file_content("../data/divina_commedia.txt");
     //auto str = file_content("../data/lorem_ipsum.txt");
     auto str = std::string("il mio angolo di cielo e un triangolo di pelo");
     //auto str = std::string("BPPRRRRRRBPGRGPR");
-    Histogram freq{(uint8_t *)str.data(), str.length()};
+    //Histogram freq{(uint8_t *)str.data(), str.length()};
 
-    // TODO: questo calcola la first order entropy che è approssimativa perchè non tiene conto delle dipendenze tra i simboli
-    //  quindi va bene con huffman che un modello a simboli indipendenti
-    double weighted_average = 0;
-    for (auto [sym, freq] : freq) {
-        cout << "s: " << sym << " f: " << freq << " p: " << probability(freq, str.length()) << '\n';
-        auto prob = probability(freq, str.length());
-        weighted_average += prob * self_information( prob );
+    ShannonHistogram freq{(uint8_t *)str.data(), str.length()};
+    for (auto [sym, f] : freq) {
+        freq.dump_entry(sym);
     }
-
-    double avg_bit_per_symbol = weighted_average;
-    double total_bits = weighted_average * str.length();
-
-    cout << "avg bit per symbol " << avg_bit_per_symbol << endl;
-    cout << "the file require at least bits: " << total_bits << " (" << uint64_t(ceil(total_bits / 8)) << " bytes)" << endl;
-
-    //return 0;
+    cout << "avg bit per symbol " << freq.avg_bit_per_symbol() << endl;
+    cout << "the file require at least bits: " << freq.total_bits() << " (" << freq.total_bytes() << " bytes)" << endl;
 
     auto tree = HuffmanTree(freq);
     auto shp_sym_tab = tree.symbol_table();

@@ -9,8 +9,6 @@
 
 
 // TODO: fornire versioni stream?
-
-
 BitArray encode(const std::vector<BitArray> &symbol_table, const std::string &str) {
 
     BitArray encoded;
@@ -42,38 +40,3 @@ std::string decode(const std::vector<BitArray> &symbol_table, const BitArray &en
 
     return decoded.str();
 }
-
-// TODO: versione che usa input stream
-#if 0
-#include <istream>
-
-std::string decode(const std::vector<BitArray> &symbol_table, std::istream &bitstream) {
-
-    std::map<std::string, uint8_t> dec_sym;
-    for (unsigned i = 0; i < symbol_table.size(); ++i) {
-        if (symbol_table[i].empty()) continue;
-        dec_sym[symbol_table[i].str()] = i;
-    }
-
-    std::ostringstream decoded;
-    BitArray token;
-
-    while (bitstream) {
-
-        // TODO: eventualmente aggiungere la possibilità in BitArray di inserire un blocco arbitratio di bit
-        //    evitare di leggere un unico byte per volta
-        BitArray8 b8;
-        bitstream.read((char *)&b8, 1);
-
-        for (int i = 0; i < 8; ++i)
-            token.push_back(b8[i]);
-
-        if (auto it = dec_sym.find(token); it != dec_sym.end()) {
-            decoded.put(it->second);
-            token.clear();
-        }
-    }
-
-    return decoded.str();
-}
-#endif

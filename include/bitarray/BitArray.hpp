@@ -98,6 +98,7 @@ struct BitArray {
         m_bit_idx = bit_length;
     }
 
+    // TODO: mettere la move e rendere explicit
     BitArray(const BitArray &o) {
         this->operator=(o);
     }

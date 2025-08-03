@@ -29,8 +29,8 @@ struct Hafe {
     static void write_symbol_table(std::ostream &os, const std::vector<BitArray> &symbol_table);
 
     Hafe() = delete;
-    Hafe(std::istream &is) { this->read(is); }
-    Hafe(std::shared_ptr<const std::vector<BitArray>> symbol_table, std::shared_ptr<const BitArray> bit_stream) {
+    explicit Hafe(std::istream &is) { this->read(is); }
+    explicit Hafe(std::shared_ptr<const std::vector<BitArray>> symbol_table, std::shared_ptr<const BitArray> bit_stream) {
         memset(m_reserved, 0x1d, sizeof m_reserved); // easy debugging
         this->symbol_table(symbol_table).bitstream(bit_stream);
     }
