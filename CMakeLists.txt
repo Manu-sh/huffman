@@ -33,7 +33,7 @@ target_compile_options(${PROJECT_NAME}
         -g
         -fstack-protector-all -fstack-protector-strong
         #-O3 -ffast-math -funroll-loops -march=native -mtune=native
-        #-funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched
+        #-funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
 )
 
 # yay -S --noconfirm doctest

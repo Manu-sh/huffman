@@ -1,7 +1,13 @@
 #pragma once
 #include <doctest/doctest.h>
 
-#include <hafe_file_format/HafeSymbolTable.hpp>
+#include <hafe_file_format/Hafe.hpp>
+#include <common.hpp>
+#include <encode_decode.hpp>
+#include <HuffmanTree.hpp>
+#include <Histogram.hpp>
+#include <bitarray/BitArray.hpp>
+
 
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <iostream>
@@ -11,18 +17,17 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 
 #include <ctime>
 #include <cstdlib>
-
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 using namespace std;
 
-TEST_CASE("testing HafeSymbolTableDiskWriter::calc_symbol_table_disk_size()") {
+TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
 
     { // single row test
         auto shp_fake_symtable = std::make_shared<vector<BitArray>>(256);
         auto &fake_symtable = *shp_fake_symtable;
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) == 0);
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) == 0);
 
         srand(time(0));
 
@@ -31,11 +36,11 @@ TEST_CASE("testing HafeSymbolTableDiskWriter::calc_symbol_table_disk_size()") {
 
         row.push_back(1); // 1° bit
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) ==
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) ==
             sizeof(uint8_t) + sizeof(uint16_t) + row.effective_byte_size()
         );
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) ==
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) ==
             1+2+1
         );
 
@@ -43,21 +48,21 @@ TEST_CASE("testing HafeSymbolTableDiskWriter::calc_symbol_table_disk_size()") {
         row.push_back(1).push_back(1).push_back(1);
         row.push_back(1).push_back(1).push_back(1).push_back(1);
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) ==
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) ==
             sizeof(uint8_t) + sizeof(uint16_t) + row.effective_byte_size()
         );
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) ==
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) ==
             1+2+1 // 4
         );
 
         row.push_back(1); // 9° bit, now is larger the row require 2 byte
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) ==
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) ==
             sizeof(uint8_t) + sizeof(uint16_t) + row.effective_byte_size()
         );
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) == 5);
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) == 5);
     }
 
     {
@@ -91,10 +96,103 @@ TEST_CASE("testing HafeSymbolTableDiskWriter::calc_symbol_table_disk_size()") {
         REQUIRE(fake_symtable['P'].effective_byte_size() == sizeof(uint8_t));
         REQUIRE(fake_symtable['R'].effective_byte_size() == sizeof(uint8_t));
 
-        REQUIRE(HafeSymbolTableDiskWriter::calc_symbol_table_disk_size(fake_symtable) ==
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_symtable) ==
             (sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint8_t)) * strlen("BGPR") // size of Rows x Column
         );
 
     }
+
+    {
+        std::string str{"il mio angolo di cielo e un triangolo di pelo"};
+        Histogram freq{(uint8_t *)str.data(), str.length()};
+
+        auto tree = HuffmanTree(freq);
+        auto shp_sym_tab = tree.symbol_table();
+        std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
+
+        std::shared_ptr<BitArray> shp_bitstream = make_shared<BitArray>(encode(symbol_table, str));
+
+        REQUIRE(shp_sym_tab != nullptr);
+        REQUIRE(shp_bitstream != nullptr);
+
+        REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
+
+        auto where = ofstream_open("/home/user/huffman/data/test.hafe");
+        Hafe hafe{shp_sym_tab, shp_bitstream};
+        hafe.write(where);
+    }
+
+    {
+        auto where = ifstream_open("/home/user/huffman/data/test.hafe");
+        Hafe hafe{where};
+
+        auto shp_sym_tab = hafe.symbol_table();
+        const auto &symbol_table = *shp_sym_tab;
+
+        REQUIRE(shp_sym_tab != nullptr);
+
+        for (unsigned i = 0; i < symbol_table.size(); ++i) {
+
+            const auto &bit_v = symbol_table[i];
+            if (bit_v.empty()) continue;
+
+            const std::string &bit_str{bit_v};
+            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
+        }
+
+        auto shp_bitstream = hafe.bitstream();
+        REQUIRE(shp_bitstream != nullptr);
+
+        auto str = decode(symbol_table, *shp_bitstream);
+        REQUIRE(str == "il mio angolo di cielo e un triangolo di pelo");
+    }
+
+
+    {
+        std::string str = file_content("/home/user/huffman/data/divina_commedia.txt");
+        Histogram freq{(uint8_t *)str.data(), str.length()};
+
+        auto tree = HuffmanTree(freq);
+        auto shp_sym_tab = tree.symbol_table();
+        std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
+
+        std::shared_ptr<BitArray> shp_bitstream = make_shared<BitArray>(encode(symbol_table, str));
+
+        REQUIRE(shp_sym_tab != nullptr);
+        REQUIRE(shp_bitstream != nullptr);
+
+        //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
+
+        auto where = ofstream_open("/home/user/huffman/data/divina_commedia.hafe");
+        Hafe hafe{shp_sym_tab, shp_bitstream};
+        hafe.write(where);
+    }
+
+    {
+        auto where = ifstream_open("/home/user/huffman/data/divina_commedia.hafe");
+        Hafe hafe{where};
+
+        auto shp_sym_tab = hafe.symbol_table();
+        const auto &symbol_table = *shp_sym_tab;
+
+        REQUIRE(shp_sym_tab != nullptr);
+
+        for (unsigned i = 0; i < symbol_table.size(); ++i) {
+
+            const auto &bit_v = symbol_table[i];
+            if (bit_v.empty()) continue;
+
+            const std::string &bit_str{bit_v};
+            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
+        }
+
+        auto shp_bitstream = hafe.bitstream();
+        REQUIRE(shp_bitstream != nullptr);
+
+        REQUIRE(shp_bitstream->effective_byte_size() == 331643); // numfmt --to=iec 331643 -> 324K
+        auto str = decode(symbol_table, *shp_bitstream);
+        REQUIRE(str == file_content("/home/user/huffman/data/divina_commedia.txt"));
+    }
+
 
 }

@@ -9,8 +9,7 @@
 #include <Histogram.hpp>
 #include <bitarray/BitArray.hpp>
 
-#include <hafe_file_format/HafeHeader.hpp>
-#include <hafe_file_format/HafeSymbolTable.hpp>
+#include <hafe_file_format/Hafe.hpp>
 
 #include <cstdio>
 #include <vector>
@@ -54,10 +53,13 @@ using namespace std;
 
 int main() {
 
+
+    // TODO: creare una class X <: Histogram contenente anche le stat e renderla implicitamente convertibile a Histogram
+
     //auto str = file_content("../data/divina_commedia.txt");
     //auto str = file_content("../data/lorem_ipsum.txt");
-    //auto str = std::string("il mio angolo di cielo e un triangolo di pelo");
-    auto str = std::string("BPPRRRRRRBPGRGPR");
+    auto str = std::string("il mio angolo di cielo e un triangolo di pelo");
+    //auto str = std::string("BPPRRRRRRBPGRGPR");
     Histogram freq{(uint8_t *)str.data(), str.length()};
 
     // TODO: questo calcola la first order entropy che è approssimativa perchè non tiene conto delle dipendenze tra i simboli

@@ -65,9 +65,11 @@ struct BitArray {
         // required_bytes can be < byte_length the user can provide a bigger chunk and ask to read only few bits
         // but the user can also ask to read 23 bits which require 3 bytes ceil(bits / 8)
         uint64_t required_bytes = bytes_required(bit_length);
-        assert(required_bytes <= byte_length);
-        /*if (required_bytes <= byte_length)
-            throw std::runtime_error{"wait... what?"}*/
+        if (required_bytes > byte_length)
+            throw std::runtime_error{"wait... what?"};
+
+        if (required_bytes == 0)
+            throw std::runtime_error{"object creation will be result in bits(0) capacity which is not allowed"};
 
         m_vct.resize(required_bytes);
         memcpy(m_vct.data(), vct, required_bytes);
@@ -81,9 +83,13 @@ struct BitArray {
         // required_bytes can be < byte_length the user can provide a bigger chunk and ask to read only few bits
         // but the user can also ask to read 23 bits which require 3 bytes ceil(bits / 8)
         uint64_t required_bytes = bytes_required(bit_length);
-        assert(required_bytes <= moveable_vector.size());
-        /*if (required_bytes <= byte_length)
-            throw std::runtime_error{"wait... what?"}*/
+
+        if (moveable_vector.size() == 0)
+            throw std::runtime_error{"object creation could be result in bits(0) capacity which is not allowed"};
+
+        if (required_bytes > moveable_vector.size())
+            throw std::runtime_error{"internal error"};
+
 
         m_vct = std::move(moveable_vector);
         //m_vct.resize(required_bytes); // this doesnt trigger realloc() and subsequent push_back() only will trigger realloc() to make more space

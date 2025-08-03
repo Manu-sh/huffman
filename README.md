@@ -11,16 +11,17 @@ All integers in little endian:
 
 `uint32_t length` of symbol table
 
-| uint8_t | uint16_t | uint8_t[]  |
-----------|----------|-------------
-| symbol  | length   | prefix code|
+| uint8_t | uint16_t   | uint8_t[]   |
+----------|------------|--------------
+| symbol  | length > 0 | prefix code |
 
+`uint64_t bitstream_length` ~~uint8_t last_byte_garbage_bits stream_size % 2**8, a compact way to express bitstream length since can be very long and it contains garbage at the end in the last byte (padding bits).~~
 
-`uint8_t last_byte_garbage_bits` stream_size % 2**8, a compact way to express bitstream length since can be very long and it contains garbage at the end in the last byte (padding bits). 
+`uint8_t[] bitstream..`
 
-bitstream..
+- Maybe a crc32 of uncompressed data will be added later there is some space reserved.
+- The length of every symbol table entry must be > 0.
 
-Maybe a crc will be added later there is some space reserved.
 
 
 ##### Learning resources

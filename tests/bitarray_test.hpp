@@ -426,5 +426,25 @@ TEST_CASE("testing explicit BitArray(vector<BitArray8>&&, uint64_t bits)") {
         // once moved you cannot use anymore
     }
 
+    { // no 0 length
+        std::vector<BitArray8> bit_stream(0);
+        CHECK_THROWS(BitArray(std::move(bit_stream), 3));
+    }
+
+
+    {
+        std::vector<BitArray8> bit_stream(1);
+        BitArray dst(std::move(bit_stream), 3);
+
+        REQUIRE(dst.effective_byte_size() == 1);
+        REQUIRE(dst.bit_capacity() == 8);
+        REQUIRE(dst.bit_length() == 3);
+        REQUIRE(dst.last_bit_idx() == 2);
+    }
+
+    { // no overflow
+        std::vector<BitArray8> bit_stream(1);
+        CHECK_THROWS(BitArray(std::move(bit_stream), 9));
+    }
 
 }

@@ -23,11 +23,20 @@ static constexpr FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) noe
 
 static std::ifstream ifstream_open(const char *filename, std::ios_base::iostate flags = std::ios_base::badbit) {
     using std::literals::string_literals::operator""s, std::ios_base;
-    std::ifstream fpnm;
-    fpnm.exceptions(flags);
-    fpnm.open(filename, ios_base::in|ios_base::binary);
-    if (!fpnm) throw std::invalid_argument{"Unable to open file: "s + filename};
-    return fpnm;
+    std::ifstream file;
+    file.exceptions(flags);
+    file.open(filename, ios_base::in|ios_base::binary);
+    if (!file) throw std::invalid_argument{"Unable to open file: "s + filename};
+    return file;
+}
+
+static std::ofstream ofstream_open(const char *filename, std::ios_base::iostate flags = std::ios_base::badbit) {
+    using std::literals::string_literals::operator""s, std::ios_base;
+    std::ofstream file;
+    file.exceptions(flags);
+    file.open(filename, ios_base::in|ios_base::binary|ios_base::trunc);
+    if (!file) throw std::invalid_argument{"Unable to open file: "s + filename};
+    return file;
 }
 
 static std::string file_content(std::string_view fname) {

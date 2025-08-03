@@ -7,13 +7,17 @@
 
 #include <bitarray/BitArray.hpp>
 
+
+// TODO: fornire versioni stream?
+
+
 BitArray encode(const std::vector<BitArray> &symbol_table, const std::string &str) {
 
     BitArray encoded;
     for (uint8_t ch : str)
         encoded += symbol_table[ch];
 
-    return encoded;
+    return std::move(encoded); // check this later
 }
 
 std::string decode(const std::vector<BitArray> &symbol_table, const BitArray &encoded) {
