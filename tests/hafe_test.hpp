@@ -194,5 +194,4 @@ TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
         REQUIRE(str == file_content("/home/user/huffman/data/divina_commedia.txt"));
     }
 
-
 }

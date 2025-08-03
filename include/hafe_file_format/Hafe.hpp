@@ -45,7 +45,7 @@ struct Hafe {
 
             assert(symbol_table);
 
-            symbol_table_size(Hafe::calc_symbol_table_disk_size(*symbol_table));
+            this->symbol_table_size(Hafe::calc_symbol_table_disk_size(*symbol_table));
             m_symbol_table = symbol_table;
             return *this;
         }
@@ -58,15 +58,16 @@ struct Hafe {
             return *this;
         }
 
-        inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_bsize = htole32(symbol_table_size), *this; }
-        inline Hafe & bitstream_bitsz(uint32_t bit_size) { return m_bitstream_bitsz = htole64(bit_size), *this; }
+        inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_bsize = htobe32(symbol_table_size), *this; }
+        inline Hafe & bitstream_bitsz(uint64_t bit_size) { return m_bitstream_bitsz = htobe64(bit_size), *this; }
 
-        inline uint32_t symbol_table_size() const noexcept { return le32toh(m_symbol_table_bsize); }
-        inline   uint64_t bitstream_bitsz() const noexcept { return le64toh(m_bitstream_bitsz);    }
+        inline uint32_t symbol_table_size() const noexcept { return be32toh(m_symbol_table_bsize); }
+        inline   uint64_t bitstream_bitsz() const noexcept { return be64toh(m_bitstream_bitsz);    }
 
         void read(std::istream &is);
 
 
+    // Every integer will be stored in hafe format endian
     private:
         // TOP:
         uint8_t m_magic[4] {};
@@ -97,9 +98,6 @@ void Hafe::read(std::istream &is) {
     if (!is.read((char *)&m_symbol_table_bsize, sizeof m_symbol_table_bsize))
         throw std::runtime_error{"missing symbol table length"};
 
-    // empty rows aren't stored on disk but they must be accessible later)
-    symbol_table_size(m_symbol_table_bsize); // convert to little endian if required
-
     // read symbol table
     m_symbol_table = read_symbol_table(is, this->symbol_table_size()); // here pass the symbol table size in host order
 
@@ -107,7 +105,6 @@ void Hafe::read(std::istream &is) {
     if (!is.read((char *)&m_bitstream_bitsz, sizeof m_bitstream_bitsz))
         throw std::runtime_error{"missing bitstream size in bits"};
 
-    bitstream_bitsz(m_bitstream_bitsz); // convert to little endian if required
 
     // finally read the bitstream
     auto bitstream_bytes = BitArray::bytes_required(this->bitstream_bitsz());
@@ -181,7 +178,7 @@ std::shared_ptr<std::vector<BitArray>> Hafe::read_symbol_table(std::istream &is,
 
         // we need this to know at which byte stop reading the bit-stream
         uint16_t byte_length = BitArray::bytes_required(
-                bit_length = le16toh(bit_length)
+                bit_length = be16toh(bit_length)
         );
 
         if (byte_length == 0)
@@ -228,13 +225,13 @@ void Hafe::write_symbol_table(std::ostream &os, const std::vector<BitArray> &sym
     os.exceptions(ios_base::badbit|ios_base::failbit|ios_base::eofbit);
 
     // write the symbol table size
-    uint32_t symbol_table_bsize = htole32(Hafe::calc_symbol_table_disk_size(symbol_table));
+    uint32_t symbol_table_bsize = htobe32(Hafe::calc_symbol_table_disk_size(symbol_table));
     if (!os.write((char *)&symbol_table_bsize, sizeof(uint32_t)))
         throw std::runtime_error{"error writing the symbol table size"};
 
     static const auto &write_entry = [] (std::ostream &os, uint8_t sym, const BitArray &huffman_code) -> bool {
 
-        uint16_t length = htole16((uint16_t)huffman_code.bit_length());
+        uint16_t length = htobe16((uint16_t)huffman_code.bit_length());
 
         os.put(sym); // symbol
         os.write((char *)&length, sizeof(uint16_t)); // length
