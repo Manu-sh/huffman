@@ -137,15 +137,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -184,15 +176,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -231,15 +215,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -276,15 +252,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -322,15 +290,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -368,15 +328,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -414,15 +366,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -461,15 +405,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -508,15 +444,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
+        print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);

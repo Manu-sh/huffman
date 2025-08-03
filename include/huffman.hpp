@@ -7,6 +7,9 @@
 #include <bitarray/BitArray.hpp>
 #include <HuffmanNode.hpp>
 
+#include <cstdio>
+#include <cctype>
+
 // TODO: disequazione di kraft mc millan
 // uint8_t bit_required = ceil(log2(pq.size()));
 // cout << "bit necessari / profondità albero: " << bit_required  << endl;
@@ -53,3 +56,16 @@ std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *roo
     return shp_symbol_table;
 }
 
+
+static void print_symbol_table(const std::vector<BitArray> &symbol_table) {
+
+    for (unsigned i = 0; i < symbol_table.size(); ++i) {
+
+        const auto &bit_v = symbol_table[i];
+        if (bit_v.empty()) continue;
+
+        const std::string &bit_str{bit_v};
+        printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
+    }
+
+}

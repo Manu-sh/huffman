@@ -12,14 +12,7 @@
     #error "FORCED() macro already defined"
 #endif
 
-#define FORCED(_UNUSED_) __attribute__((always_inline))
-
-
-// ceil_div(x, 8) -> same of (int)ceil(x/8.)
-static constexpr FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) noexcept {
-    return (num-1) / div + 1;
-}
-
+#define FORCED(_UNUSED_) inline __attribute__((always_inline))
 
 static std::ifstream ifstream_open(const char *filename, std::ios_base::iostate flags = std::ios_base::badbit) {
     using std::literals::string_literals::operator""s, std::ios_base;

@@ -8,8 +8,9 @@
 #include <cassert>
 #include <cstring>
 
-#include "../common.hpp"
 #include "BitArray8.hpp"
+#include "math/math.hpp"
+#include "common.hpp"
 
 // TODO: reserve() and resize() method
 
@@ -19,7 +20,7 @@
 struct BitArray {
 
     // es. 9 bit requires 2 byte -> byte_required(9) -> 2
-    static inline constexpr auto bytes_required(uint64_t bits) noexcept {
+    static FORCED(inline) constexpr auto bytes_required(uint64_t bits) noexcept {
         //return bits == 0 ? 1 : ceil_div(bits, 8);
         return ceil_div(bits, 8);
     }

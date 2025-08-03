@@ -63,26 +63,14 @@ int main() {
     auto shp_sym_tab = tree.symbol_table();
     std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
 
-    for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-        const auto &bit_v = symbol_table[i];
-        if (bit_v.empty()) continue;
-
-        const std::string &bit_str{bit_v};
-        printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-    }
-
+    print_symbol_table(symbol_table);
 
     BitArray encoded = encode(symbol_table, str);
     //cout << encoded.str() << endl;
 
     auto decoded = decode(symbol_table, encoded);
-    //cout << decoded.length() << endl;
-    //cout << decoded << endl;
     assert(decoded == str);
 
-    cout << encoded.bit_length() << '/' << (decoded.length() * 8) << " bits" << endl;
-    cout << 100. * encoded.bit_length() / (decoded.length() * 8) << '%' << endl;
-
+    print_compression_stats(encoded, decoded);
 
 }

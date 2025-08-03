@@ -1,5 +1,6 @@
 #pragma once
 #include <Histogram.hpp>
+#include <math/math.hpp>
 
 #include <cstdint>
 #include <cmath>
@@ -10,21 +11,11 @@
 // this class only store "useless" stats that can be useful for debug etc, to compute huffman all you need is Histogram
 struct ShannonHistogram: public Histogram {
 
-    static inline double probability(uint64_t frequency, uint64_t length) noexcept {
-        assert(length > 0);
-        return double(frequency) / length;
-    }
-
-    static inline double self_information(double probability) noexcept {
-        assert(probability > 0);
-        return log2(1 / probability);
-    }
-
     struct shannon_entry_t {
 
         shannon_entry_t & calc(uint32_t frequency, uint64_t dataset_length) {
-            this->probability      = ShannonHistogram::probability(frequency, dataset_length);
-            this->self_information = ShannonHistogram::self_information( this->probability );
+            this->probability      = shannon_probability(frequency, dataset_length);
+            this->self_information = shannon_self_information( this->probability );
             return *this;
         }
 
