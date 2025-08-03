@@ -110,7 +110,7 @@ TEST_CASE("testing .hafe compress & decompress") {
     // im sorry for this-copy paste but im bit tired and are just tests
 
         { // compress
-        std::string str = file_content("/home/user/huffman/data/divina_commedia.txt");
+        std::string str = file_content("../../data/divina_commedia.txt");
         Histogram freq{(uint8_t *)str.data(), str.length()};
 
         auto tree = HuffmanTree(freq);
@@ -124,13 +124,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/divina_commedia.hafe");
+        auto where = ofstream_open("../../data/divina_commedia.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/divina_commedia.hafe");
+        auto where = ifstream_open("../../data/divina_commedia.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -152,12 +152,12 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         REQUIRE(shp_bitstream->effective_byte_size() == 331643); // numfmt --to=iec 331643 -> 324K
         auto str = decode(symbol_table, *shp_bitstream);
-        REQUIRE(str == file_content("/home/user/huffman/data/divina_commedia.txt"));
+        REQUIRE(str == file_content("../../data/divina_commedia.txt"));
     }
 
 
     { // compress
-        std::string str = file_content("/home/user/huffman/data/lorem_ipsum.txt");
+        std::string str = file_content("../../data/lorem_ipsum.txt");
         Histogram freq{(uint8_t *)str.data(), str.length()};
 
         auto tree = HuffmanTree(freq);
@@ -171,13 +171,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/lorem_ipsum.hafe");
+        auto where = ofstream_open("../../data/lorem_ipsum.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/lorem_ipsum.hafe");
+        auto where = ifstream_open("../../data/lorem_ipsum.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -199,7 +199,7 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(shp_bitstream->effective_byte_size() == 331643); // numfmt --to=iec 331643 -> 324K
         auto str = decode(symbol_table, *shp_bitstream);
-        REQUIRE(str == file_content("/home/user/huffman/data/lorem_ipsum.txt"));
+        REQUIRE(str == file_content("../../data/lorem_ipsum.txt"));
     }
 
 
@@ -218,13 +218,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/test.hafe");
+        auto where = ofstream_open("../../data/test.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/test.hafe");
+        auto where = ifstream_open("../../data/test.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -263,13 +263,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/test-2.hafe");
+        auto where = ofstream_open("../../data/test-2.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/test-2.hafe");
+        auto where = ifstream_open("../../data/test-2.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -309,13 +309,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/test-3.hafe");
+        auto where = ofstream_open("../../data/test-3.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/test-3.hafe");
+        auto where = ifstream_open("../../data/test-3.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -355,13 +355,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/test-4.hafe");
+        auto where = ofstream_open("../../data/test-4.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/test-4.hafe");
+        auto where = ifstream_open("../../data/test-4.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -401,13 +401,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/test-5.hafe");
+        auto where = ofstream_open("../../data/test-5.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/test-5.hafe");
+        auto where = ifstream_open("../../data/test-5.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -448,13 +448,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/test-6.hafe");
+        auto where = ofstream_open("../../data/test-6.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/test-6.hafe");
+        auto where = ifstream_open("../../data/test-6.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -481,7 +481,7 @@ TEST_CASE("testing .hafe compress & decompress") {
 
 
     { // compress a binary file
-        std::string str = file_content("/home/user/huffman/data/mandelbrot.pnm");
+        std::string str = file_content("../../data/mandelbrot.pnm");
         Histogram freq{(uint8_t *)str.data(), str.length()};
 
         auto tree = HuffmanTree(freq);
@@ -495,13 +495,13 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
 
-        auto where = ofstream_open("/home/user/huffman/data/mandelbrot.pnm.hafe");
+        auto where = ofstream_open("../../data/mandelbrot.pnm.hafe");
         Hafe hafe{shp_sym_tab, shp_bitstream};
         hafe.write(where);
     }
 
     { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/mandelbrot.pnm.hafe");
+        auto where = ifstream_open("../../data/mandelbrot.pnm.hafe");
         Hafe hafe{where};
 
         auto shp_sym_tab = hafe.symbol_table();
@@ -523,9 +523,9 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //REQUIRE(shp_bitstream->effective_byte_size() == 331643); // numfmt --to=iec 331643 -> 324K
         auto str = decode(symbol_table, *shp_bitstream);
-        REQUIRE(str == file_content("/home/user/huffman/data/mandelbrot.pnm"));
+        REQUIRE(str == file_content("../../data/mandelbrot.pnm"));
 
-        auto out = ofstream_open("/home/user/huffman/data/mandelbrot.pnm.out");
+        auto out = ofstream_open("../../data/mandelbrot.pnm.out");
         out.write((char *)str.data(), str.length());
     }
 

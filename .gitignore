@@ -45,4 +45,9 @@
 cmake-build-debug/
 build/
 
-data/
+data/*.zip
+data/*.gzip
+data/*.Z
+data/*.bzip
+data/*.hafe
+data/*.out
