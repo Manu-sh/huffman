@@ -109,53 +109,7 @@ TEST_CASE("testing .hafe compress & decompress") {
 
     // im sorry for this-copy paste but im bit tired and are just tests
 
-    { // compress
-        std::string str{"il mio angolo di cielo e un triangolo di pelo"};
-        Histogram freq{(uint8_t *)str.data(), str.length()};
-
-        auto tree = HuffmanTree(freq);
-        auto shp_sym_tab = tree.symbol_table();
-        std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
-
-        std::shared_ptr<BitArray> shp_bitstream = make_shared<BitArray>(encode(symbol_table, str));
-
-        REQUIRE(shp_sym_tab != nullptr);
-        REQUIRE(shp_bitstream != nullptr);
-
-        REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
-
-        auto where = ofstream_open("/home/user/huffman/data/test.hafe");
-        Hafe hafe{shp_sym_tab, shp_bitstream};
-        hafe.write(where);
-    }
-
-    { // decompress
-        auto where = ifstream_open("/home/user/huffman/data/test.hafe");
-        Hafe hafe{where};
-
-        auto shp_sym_tab = hafe.symbol_table();
-        const auto &symbol_table = *shp_sym_tab;
-
-        REQUIRE(shp_sym_tab != nullptr);
-
-        for (unsigned i = 0; i < symbol_table.size(); ++i) {
-
-            const auto &bit_v = symbol_table[i];
-            if (bit_v.empty()) continue;
-
-            const std::string &bit_str{bit_v};
-            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
-        }
-
-        auto shp_bitstream = hafe.bitstream();
-        REQUIRE(shp_bitstream != nullptr);
-
-        auto str = decode(symbol_table, *shp_bitstream);
-        REQUIRE(str == "il mio angolo di cielo e un triangolo di pelo");
-    }
-
-
-    { // compress
+        { // compress
         std::string str = file_content("/home/user/huffman/data/divina_commedia.txt");
         Histogram freq{(uint8_t *)str.data(), str.length()};
 
@@ -201,6 +155,98 @@ TEST_CASE("testing .hafe compress & decompress") {
         REQUIRE(str == file_content("/home/user/huffman/data/divina_commedia.txt"));
     }
 
+
+    { // compress
+        std::string str = file_content("/home/user/huffman/data/lorem_ipsum.txt");
+        Histogram freq{(uint8_t *)str.data(), str.length()};
+
+        auto tree = HuffmanTree(freq);
+        auto shp_sym_tab = tree.symbol_table();
+        std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
+
+        std::shared_ptr<BitArray> shp_bitstream = make_shared<BitArray>(encode(symbol_table, str));
+
+        REQUIRE(shp_sym_tab != nullptr);
+        REQUIRE(shp_bitstream != nullptr);
+
+        //REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
+
+        auto where = ofstream_open("/home/user/huffman/data/lorem_ipsum.hafe");
+        Hafe hafe{shp_sym_tab, shp_bitstream};
+        hafe.write(where);
+    }
+
+    { // decompress
+        auto where = ifstream_open("/home/user/huffman/data/lorem_ipsum.hafe");
+        Hafe hafe{where};
+
+        auto shp_sym_tab = hafe.symbol_table();
+        const auto &symbol_table = *shp_sym_tab;
+
+        REQUIRE(shp_sym_tab != nullptr);
+
+        for (unsigned i = 0; i < symbol_table.size(); ++i) {
+
+            const auto &bit_v = symbol_table[i];
+            if (bit_v.empty()) continue;
+
+            const std::string &bit_str{bit_v};
+            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
+        }
+
+        auto shp_bitstream = hafe.bitstream();
+        REQUIRE(shp_bitstream != nullptr);
+
+        //REQUIRE(shp_bitstream->effective_byte_size() == 331643); // numfmt --to=iec 331643 -> 324K
+        auto str = decode(symbol_table, *shp_bitstream);
+        REQUIRE(str == file_content("/home/user/huffman/data/lorem_ipsum.txt"));
+    }
+
+
+    { // compress
+        std::string str{"il mio angolo di cielo e un triangolo di pelo"};
+        Histogram freq{(uint8_t *)str.data(), str.length()};
+
+        auto tree = HuffmanTree(freq);
+        auto shp_sym_tab = tree.symbol_table();
+        std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
+
+        std::shared_ptr<BitArray> shp_bitstream = make_shared<BitArray>(encode(symbol_table, str));
+
+        REQUIRE(shp_sym_tab != nullptr);
+        REQUIRE(shp_bitstream != nullptr);
+
+        REQUIRE(Hafe::calc_symbol_table_disk_size(symbol_table) == 60);
+
+        auto where = ofstream_open("/home/user/huffman/data/test.hafe");
+        Hafe hafe{shp_sym_tab, shp_bitstream};
+        hafe.write(where);
+    }
+
+    { // decompress
+        auto where = ifstream_open("/home/user/huffman/data/test.hafe");
+        Hafe hafe{where};
+
+        auto shp_sym_tab = hafe.symbol_table();
+        const auto &symbol_table = *shp_sym_tab;
+
+        REQUIRE(shp_sym_tab != nullptr);
+
+        for (unsigned i = 0; i < symbol_table.size(); ++i) {
+
+            const auto &bit_v = symbol_table[i];
+            if (bit_v.empty()) continue;
+
+            const std::string &bit_str{bit_v};
+            printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
+        }
+
+        auto shp_bitstream = hafe.bitstream();
+        REQUIRE(shp_bitstream != nullptr);
+
+        auto str = decode(symbol_table, *shp_bitstream);
+        REQUIRE(str == "il mio angolo di cielo e un triangolo di pelo");
+    }
 
     { // compress
         std::string str{"aaaaabbbbbbbbbccccccccccccdddddddddddddeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffffff"};

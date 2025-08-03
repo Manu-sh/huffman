@@ -58,11 +58,17 @@ struct Hafe {
             return *this;
         }
 
+#ifdef DBG_HAFE_BIG_ENDIAN
         inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_bsize = htobe32(symbol_table_size), *this; }
         inline Hafe & bitstream_bitsz(uint64_t bit_size) { return m_bitstream_bitsz = htobe64(bit_size), *this; }
-
         inline uint32_t symbol_table_size() const noexcept { return be32toh(m_symbol_table_bsize); }
         inline   uint64_t bitstream_bitsz() const noexcept { return be64toh(m_bitstream_bitsz);    }
+#else
+        inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_bsize = htole32(symbol_table_size), *this; }
+        inline Hafe & bitstream_bitsz(uint64_t bit_size) { return m_bitstream_bitsz = htole64(bit_size), *this; }
+        inline uint32_t symbol_table_size() const noexcept { return le32toh(m_symbol_table_bsize); }
+        inline   uint64_t bitstream_bitsz() const noexcept { return le64toh(m_bitstream_bitsz);    }
+#endif
 
         void read(std::istream &is);
 
@@ -136,7 +142,6 @@ void Hafe::write(std::ostream &os) const {
     // write symbol table
     write_symbol_table(os, *m_symbol_table);
 
-    // TODO: if something change remember endianess here
     // write the bitstream size in bits
     if (!os.write((char *)&m_bitstream_bitsz, sizeof m_bitstream_bitsz))
         throw std::runtime_error{"error writing reserved bytes"};
@@ -178,12 +183,17 @@ std::shared_ptr<std::vector<BitArray>> Hafe::read_symbol_table(std::istream &is,
 
         // we need this to know at which byte stop reading the bit-stream
         uint16_t byte_length = BitArray::bytes_required(
+#ifdef DBG_HAFE_BIG_ENDIAN
                 bit_length = be16toh(bit_length)
+#else
+                bit_length = le16toh(bit_length)
+#endif
         );
 
         if (byte_length == 0)
             throw std::runtime_error{"refuse to create a symbol table entry with size 0"};
 
+        //std::cout << "sym:" << sym << ":bysz:" << byte_length << std::endl;
 
         // the same value CANNOT be obtained by: BitArray{reserve_bit_length}.effective_byte_size()
         std::vector <BitArray8> bit_stream(byte_length);
@@ -225,13 +235,22 @@ void Hafe::write_symbol_table(std::ostream &os, const std::vector<BitArray> &sym
     os.exceptions(ios_base::badbit|ios_base::failbit|ios_base::eofbit);
 
     // write the symbol table size
+#ifdef DBG_HAFE_BIG_ENDIAN
     uint32_t symbol_table_bsize = htobe32(Hafe::calc_symbol_table_disk_size(symbol_table));
+#else
+    uint32_t symbol_table_bsize = htole32(Hafe::calc_symbol_table_disk_size(symbol_table));
+#endif
+
     if (!os.write((char *)&symbol_table_bsize, sizeof(uint32_t)))
         throw std::runtime_error{"error writing the symbol table size"};
 
     static const auto &write_entry = [] (std::ostream &os, uint8_t sym, const BitArray &huffman_code) -> bool {
 
+#ifdef DBG_HAFE_BIG_ENDIAN
         uint16_t length = htobe16((uint16_t)huffman_code.bit_length());
+#else
+        uint16_t length = htole16((uint16_t)huffman_code.bit_length());
+#endif
 
         os.put(sym); // symbol
         os.write((char *)&length, sizeof(uint16_t)); // length
