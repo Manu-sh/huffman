@@ -26,3 +26,35 @@ static FORCED(inline) double shannon_self_information(double probability) noexce
     assert(probability > 0);
     return std::log2(1 / probability);
 }
+
+/*
+La probabilità (assoluta) è definita come:
+
+    N occorrenze / lunghezza insieme
+Oppure:
+    Frequenza / lunghezza insieme
+
+Es.
+    f32 probability = str.count('a') / str.length()
+    f32 fractional_bits = log2(1 / probability)
+
+    https://en.wikipedia.org/wiki/Quantities_of_information#Self-information
+
+  in sintesi:
+        la quantità di informazione associata a un evento z si misura come il logaritmo negativo della sua probabilità,
+        siccome siamo in bit la base del logaritmo diventa n=2,
+
+        per liberarci del meno anziché fare -log2(probability)  facciamo log2(1 / probability)
+        ovvero dividiamo 1 per l'argomento del logaritmo così da poter togliere il meno.
+
+        questo valore rappresenta i bit MINIMI necessari per codificare l’evento (secondo Shannon)
+
+    in summary:
+        the amount of information associated with an event z is measured as the negative logarithm of its probability,
+        since we are working in bits, the base of the logarithm becomes n=2,
+
+        to get rid of the minus sign, instead of doing -log2(probability) we use log2(1 / probability)
+        that is, we divide 1 by the argument of the logarithm so we can drop the minus.
+
+        this value represents the MINIMUM number of bits needed to encode the event (according to Shannon)
+*/
