@@ -154,12 +154,14 @@ struct BitArray {
             //return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) % (floor_log2(prefix_code.bit_length() + 1) + 1);
             // return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ (floor_log2(prefix_code.bit_length() + 1) + 1);
 
-            return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
+           return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
         }
     };
 
     // TODO: migliorami
     FORCED(inline) bool operator==(const BitArray &o) const {
+
+        // static int count = 0;
 
         if (m_bit_idx != o.m_bit_idx) // same of:  if (bit_length() != o.bit_length())
             return false;
@@ -171,19 +173,6 @@ struct BitArray {
         if (uint8_t rest = m_bit_idx & 7) {
 
             //assert(rest && effective_byte_size() > 0);
-
-/*
-            // clone the padding and compare the last byte
-            BitArray8 this_last_byte = back_byte();
-            BitArray8    o_last_byte = o.back_byte();
-
-            // alter the padding bits of *this to be exactly the same as &o
-            for (; rest < 8; ++rest)
-                this_last_byte(rest, o_last_byte[rest]); // clone his padding
-
-            if (this_last_byte != o_last_byte)
-                return false;
-*/
 
             // cut away the padding bits
             const uint8_t last_byte_this  = (((uint8_t)back_byte())   >> (8 - rest));
@@ -198,6 +187,8 @@ struct BitArray {
             skip_last_byte = 1;
         }
 
+        // if (effective_byte_size() > 8) ++count;
+        //if (count % 10 == 0) std::cout << count << std::endl;
         return memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte) == 0;
     }
 
