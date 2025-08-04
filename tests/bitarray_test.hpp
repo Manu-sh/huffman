@@ -448,3 +448,86 @@ TEST_CASE("testing explicit BitArray(vector<BitArray8>&&, uint64_t bits)") {
     }
 
 }
+
+
+TEST_CASE("testing advance compare") {
+
+    {
+        BitArray bit_src(8);
+        BitArray bit_dst(8);
+
+        bit_src.push_back(1);
+        bit_dst.push_back(1);
+
+        BitArray8 &dst_back_byte = bit_dst.back_byte();
+        BitArray8 &src_back_byte = bit_src.back_byte();
+        REQUIRE(src_back_byte[0] == 1);
+
+        // simulate a different padding at the end between bit_dst & bit_src
+        src_back_byte(1, 1);
+        dst_back_byte(1, 0);
+
+        REQUIRE(bit_src.bit_length() == 1);
+        REQUIRE(bit_dst.bit_length() == 1);
+        REQUIRE(dst_back_byte != src_back_byte);
+        REQUIRE(bit_src == bit_dst);
+    }
+
+
+    {
+
+        for (int i = 0; i < 128; ++i) {
+
+            BitArray bit_src(i+1);
+            BitArray bit_dst(i+1);
+            //BitArray calimero(i+1);
+
+            for (int k = 1; k <= i+1; ++k) {
+                bit_src.push_back(1);
+                bit_dst.push_back(1);
+                //calimero.push_back(0);
+            }
+
+            BitArray8 &dst_back_byte = bit_dst.back_byte();
+            BitArray8 &src_back_byte = bit_src.back_byte();
+            REQUIRE(src_back_byte[0] == dst_back_byte[0]);
+            REQUIRE(src_back_byte[1] == dst_back_byte[1]);
+
+            // simulate a different padding at the end between bit_dst & bit_src
+            if ((i+1)%8 != 0) {
+                src_back_byte((i+1)%8, 1);
+                dst_back_byte((i+1)%8, 0);
+            }
+
+            REQUIRE(bit_src.bit_length() == i+1);
+            REQUIRE(bit_dst.bit_length() == i+1);
+            
+            REQUIRE(bit_src.back() == 1);
+            REQUIRE(bit_dst.back() == 1);
+            REQUIRE(bit_src.back() == bit_dst.back());
+
+            if ((i+1)%8 != 0) {
+                REQUIRE(dst_back_byte != src_back_byte);
+            } else {
+                REQUIRE(dst_back_byte == src_back_byte);
+            }
+
+            //REQUIRE(bit_src == bit_dst);
+
+            if (bit_src != bit_dst) {
+
+                //cout << i << endl;
+                bool x = bit_src == bit_dst;
+                if ((i+1)%8 != 0) {
+                    REQUIRE(x == true);
+                } else {
+                    REQUIRE(x == false);
+                }
+            }
+        }
+
+
+    }
+
+
+}

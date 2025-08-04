@@ -22,23 +22,24 @@ struct BitArray {
     // es. 9 bit requires 2 byte -> byte_required(9) -> 2
     static FORCED(inline) constexpr auto bytes_required(uint64_t bits) noexcept {
         //return bits == 0 ? 1 : ceil_div(bits, 8);
+        assert(bits);
         return ceil_div(bits, 8);
     }
 
     // effective_byte_size() -> return in which byte is stored the latest bit 0 if none
     // so DONT write m_vct[effective_byte_size()-1]
     // the underlying container (vector) can be bigger than the actual byte size
-    inline uint64_t effective_byte_size() const noexcept {
+    FORCED(inline) uint64_t effective_byte_size() const noexcept {
         return bit_length() == 0 ? 0 : bytes_required(bit_length());
     }
 
     // last_element_byte_idx() -> m_vct[ last_element_byte_idx() ] always is valid
-    inline uint64_t last_element_byte_idx() const noexcept {
+    FORCED(inline) uint64_t last_element_byte_idx() const noexcept {
 
         // m_bit_idx point to the next unused bit
         // if we have 8 bit stored his value is 8 but the last element is stored into this[7]
 
-       return effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
+       return effective_byte_size() - (effective_byte_size() != 0); // same of: effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
     }
 
     FORCED(inline) uint64_t last_bit_idx() const noexcept {
@@ -59,6 +60,8 @@ struct BitArray {
         m_bit_capacity{bytes_required(bit_length) * 8} // number of bit slots effectively available
     {
 
+        if (bit_length == 0)
+            throw std::runtime_error{"invalid argument bit_length=0 is not accepted"};
     }
 
     explicit BitArray(BitArray8 *vct, uint64_t byte_length, uint64_t bit_length) {
@@ -120,9 +123,60 @@ struct BitArray {
 
     BitArray & operator+=(const BitArray &o);
 
-    inline uint64_t bit_length()   const noexcept { return m_bit_idx;         } // bits you have pushed with push function
-    inline uint64_t bit_capacity() const noexcept { return m_bit_capacity;    } // in this container bit_capacity()-1 is always accessible, this value is at least 1
-    inline     bool empty()        const noexcept { return !m_bit_idx;        }
+
+    struct HashPrefixCode {
+        FORCED(inline) std::size_t operator()(const BitArray &prefix_code) const {
+            return std::hash<uint8_t>()( (uint8_t)prefix_code.back_byte() ) ^ std::hash<uint64_t>()( prefix_code.bit_length() );
+        }
+    };
+
+    // TODO: migliorami
+    FORCED(inline) bool operator==(const BitArray &o) const {
+
+        if (m_bit_idx != o.m_bit_idx)
+            return false;
+
+        //assert(m_bit_idx);
+
+        bool skip_last_byte = 0;
+
+        //if (uint8_t rest = m_bit_idx % 8) {
+        if (uint8_t rest = m_bit_idx & 7) {
+
+            //assert(rest && effective_byte_size() > 0);
+
+/*
+            // clone the padding and compare the last byte
+            BitArray8 this_last_byte = back_byte();
+            BitArray8    o_last_byte = o.back_byte();
+
+            // alter the padding bits of *this to be exactly the same as &o
+            for (; rest < 8; ++rest)
+                this_last_byte(rest, o_last_byte[rest]); // clone his padding
+
+            if (this_last_byte != o_last_byte)
+                return false;
+*/
+
+            // cut away the padding bits
+            const uint8_t last_byte_this  = (((uint8_t)back_byte())   >> (8 - rest));
+            const uint8_t last_byte_other = (((uint8_t)o.back_byte()) >> (8 - rest));
+
+            if (last_byte_this != last_byte_other)
+                return false;
+
+            if (effective_byte_size() == 1) // è grande esattamente 1 byte, evita di passare a memcmp() perchè con size 0 giustamente scazza
+                return true;
+
+            skip_last_byte = 1;
+        }
+
+        return memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte) == 0;
+    }
+
+    FORCED(inline) uint64_t bit_length()   const noexcept { return m_bit_idx;         } // bits you have pushed with push function
+    FORCED(inline) uint64_t bit_capacity() const noexcept { return m_bit_capacity;    } // in this container bit_capacity()-1 is always accessible, this value is at least 1
+    FORCED(inline)     bool empty()        const noexcept { return !m_bit_idx;        }
 
     inline void clear() {
 
@@ -156,7 +210,7 @@ struct BitArray {
         );
     }
 
-    BitArray & push_back(bool value) {
+    FORCED(inline) BitArray & push_back(bool value) {
 
         if (m_bit_idx >= m_bit_capacity-1) {
             m_vct.push_back({}); // attach a new 8 bit chunk
@@ -205,8 +259,15 @@ struct BitArray {
     const_iterator   cend() const;
 
     inline const void * bitstream() const { return m_vct.data(); }
+    FORCED(inline) const BitArray8 & back_byte() const {
+        return m_vct[last_element_byte_idx()];
+    }
 
-        protected:
+    FORCED(inline) BitArray8 & back_byte() {
+        return m_vct[last_element_byte_idx()];
+    }
+
+    protected:
             std::vector<BitArray8> m_vct; // used as memory block
             uint64_t m_bit_idx{}; // index where insert the next value, when array created = 0
             uint64_t m_bit_capacity{};

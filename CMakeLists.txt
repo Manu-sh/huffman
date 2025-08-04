@@ -29,9 +29,8 @@ target_compile_options(${PROJECT_NAME}
     PRIVATE
         -pedantic
         -Wall -Wextra -Wno-unused-function -pipe
-        -O0
-        -g
         -fstack-protector-all -fstack-protector-strong
+        -O0 -g
         #-O3 -ffast-math -funroll-loops -march=native -mtune=native
         #-funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
 )

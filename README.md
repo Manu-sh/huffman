@@ -9,8 +9,7 @@
 ./huffman - < divina_commedia.txt.hafe > divina_commedia.txt
 
 # checksum
-md5sum divina_commedia.txt
-md5sum ../data/divina_commedia.txt
+md5sum divina_commedia.txt ../data/divina_commedia.txt
 ```
 
 Example of format
