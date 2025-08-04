@@ -17,12 +17,6 @@
 // TODO: avere effective_byte_size() sempre ad almeno 1 semplificherebbe molto l'arimentica
 //   usare empty per determinare se è il caso di skippare la copia probabilmente va riscritta poi la parte memcpy e aggiornati i test
 
-#include <bit>  // C++20
-
-static FORCED(inline) uint64_t floor_log2(uint64_t x) {
-    return x == 0 ? 0 : std::bit_width(x) - 1;
-}
-
 struct BitArray {
 
     // es. 9 bit requires 2 byte -> byte_required(9) -> 2
@@ -139,11 +133,28 @@ struct BitArray {
 
         FORCED(inline) std::size_t operator()(const BitArray &prefix_code) const noexcept {
             //return std::hash<uint8_t>()( (uint8_t)prefix_code.back_byte() ) ^ std::hash<uint64_t>()( prefix_code.bit_length() );
-            //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length(); // same of (prefix_code.back_byte() + 1)%prefix_code.bit_length()
-            //assert((uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length() == ((uint8_t)prefix_code.back_byte() + 1)%prefix_code.bit_length());
+            //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
+
             //return (uint8_t)prefix_code.back_byte() ^ (uint64_t)log2(prefix_code.bit_length());
-            //return (uint8_t)prefix_code.back_byte() ^ floor_log2(prefix_code.bit_length());
-            return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
+            //return (uint8_t(prefix_code.back_byte())+1) % floor_log2(prefix_code.bit_length());
+            //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
+
+            //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) ^ prefix_code.bit_length();
+            //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) % 256;
+
+            // return ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ prefix_code.bit_length();
+            //return ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ 255;
+            //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) ^ 255;
+
+            //return (uint8_t)prefix_code.back_byte() ^ 255;
+
+            //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
+            //return (uint8_t)prefix_code.back_byte() % (floor_log2(prefix_code.bit_length() + 1) + 1);
+            //return (uint8_t)prefix_code.back_byte() ^ (floor_log2(prefix_code.bit_length() + 1) + 1);
+            //return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) % (floor_log2(prefix_code.bit_length() + 1) + 1);
+            // return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ (floor_log2(prefix_code.bit_length() + 1) + 1);
+
+            return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
         }
     };
 
