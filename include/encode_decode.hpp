@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <map>
+#include <unordered_map>
 #include <ostream>
 #include <iostream>
 
@@ -30,14 +30,16 @@ static BitArray encode(const std::vector<BitArray> &symbol_table, const std::str
 
 static std::string decode(const std::vector<BitArray> &symbol_table, const BitArray &encoded) {
 
-    std::map<std::string, uint8_t> dec_sym;
+    std::unordered_map<std::string, uint8_t> dec_sym;
+    dec_sym.reserve(256);
+
     for (unsigned i = 0; i < symbol_table.size(); ++i) {
         if (symbol_table[i].empty()) continue;
         dec_sym[symbol_table[i].str()] = i;
     }
 
     std::ostringstream decoded;
-    BitArray token;
+    BitArray token(1000 * 8 * 1);
     for (bool bit : encoded) {
         token.push_back(bit);
 
