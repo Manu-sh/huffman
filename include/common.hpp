@@ -3,6 +3,7 @@
 #include <fstream>
 #include <filesystem>
 #include <ios>
+#include <sstream>
 
 // i could use template specialization and sfinae to force inlining
 // for some of these global function, but it's unnecessarily
@@ -40,4 +41,10 @@ static std::string file_content(std::string_view fname) {
     std::string buffer(size, '\0');
     is.read(&buffer[0], size);
     return buffer;
+}
+
+static std::string stream_content(std::istream &is) {
+    std::ostringstream oss;
+    oss << is.rdbuf();
+    return oss.str();
 }

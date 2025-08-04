@@ -1,6 +1,18 @@
 ### Huffman
 ###### 
 
+```bash
+# compress
+./huffman < ../data/divina_commedia.txt > divina_commedia.txt.hafe
+
+# decompress
+./huffman - < divina_commedia.txt.hafe > divina_commedia.txt
+
+# checksum
+md5sum divina_commedia.txt
+md5sum ../data/divina_commedia.txt
+```
+
 Example of format
 
 All integers in **Little Endian**:
