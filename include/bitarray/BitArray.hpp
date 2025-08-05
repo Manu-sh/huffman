@@ -158,7 +158,6 @@ struct BitArray {
         }
     };
 
-    // TODO: migliorami
     FORCED(inline) bool operator==(const BitArray &o) const {
 
         // static int count = 0;
@@ -175,8 +174,10 @@ struct BitArray {
             //assert(rest && effective_byte_size() > 0);
 
             // cut away the padding bits
-            const uint8_t last_byte_this  = (((uint8_t)back_byte())   >> (8 - rest));
-            const uint8_t last_byte_other = (((uint8_t)o.back_byte()) >> (8 - rest));
+            //const uint8_t last_byte_this  = (((uint8_t)back_byte())   >> (8 - rest));
+            //const uint8_t last_byte_other = (((uint8_t)o.back_byte()) >> (8 - rest));
+            const uint8_t last_byte_this  = back_byte().take_few(rest);
+            const uint8_t last_byte_other = o.back_byte().take_few(rest);
 
             if (last_byte_this != last_byte_other)
                 return false;
