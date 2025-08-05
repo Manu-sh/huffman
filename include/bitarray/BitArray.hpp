@@ -123,41 +123,6 @@ struct BitArray {
 
     BitArray & operator+=(const BitArray &o);
 
-
-    struct HashPrefixCode final {
-
-        // prefix-code più lunghi sono meno frequenti, per cui bisogna cercare distribuire le collisioni su elementi lunghi
-        // anzichè usare una distribuzione uniforme come (x+1)%256 ovvero x^(256-1)
-        // bisogna andare su una distribuzione pesata con pesi inversamente proporzionali alla lunghezza del prefix-code
-        // x ^ log2(prefix.bit_length) ovvero -> (x+1) % log2(prefix.bit_length)
-
-        FORCED(inline) std::size_t operator()(const BitArray &prefix_code) const noexcept {
-            //return std::hash<uint8_t>()( (uint8_t)prefix_code.back_byte() ) ^ std::hash<uint64_t>()( prefix_code.bit_length() );
-            //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
-
-            //return (uint8_t)prefix_code.back_byte() ^ (uint64_t)log2(prefix_code.bit_length());
-            //return (uint8_t(prefix_code.back_byte())+1) % floor_log2(prefix_code.bit_length());
-            //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
-
-            //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) ^ prefix_code.bit_length();
-            //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) % 256;
-
-            // return ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ prefix_code.bit_length();
-            //return ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ 255;
-            //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) ^ 255;
-
-            //return (uint8_t)prefix_code.back_byte() ^ 255;
-
-            //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
-            //return (uint8_t)prefix_code.back_byte() % (floor_log2(prefix_code.bit_length() + 1) + 1);
-            //return (uint8_t)prefix_code.back_byte() ^ (floor_log2(prefix_code.bit_length() + 1) + 1);
-            //return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) % (floor_log2(prefix_code.bit_length() + 1) + 1);
-            // return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ (floor_log2(prefix_code.bit_length() + 1) + 1);
-
-           return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
-        }
-    };
-
     FORCED(inline) bool operator==(const BitArray &o) const {
 
         // static int count = 0;

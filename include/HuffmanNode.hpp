@@ -2,15 +2,18 @@
 #include <cstdint>
 #include <cctype>
 #include <cassert>
-#include <bitarray/BitArray.hpp>
-
 #include <sstream>
 #include <memory>
 #include <vector>
 
+#include <bitarray/BitArray.hpp>
+#include <HuffmanNode.hpp>
+
 struct HuffmanNode final {
 
-    friend std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root);
+    friend class SymbolTable;
+
+    //friend std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root);
 
     enum: uint8_t {
         CHILD_LEFT,

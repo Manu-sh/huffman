@@ -1,24 +1,53 @@
 #pragma once
-
+#include <memory>
 #include <vector>
-#include <string>
-#include <forward_list>
 
 #include <bitarray/BitArray.hpp>
-#include <HuffmanNode.hpp>
+#include <HuffmanTree.hpp>
+#include <InverseSymbolTable.hpp>
 
+#include <string>
+#include <forward_list>
 #include <cstdio>
 #include <cctype>
 
+/*
 // TODO: disequazione di kraft mc millan
 // uint8_t bit_required = ceil(log2(pq.size()));
 // cout << "bit necessari / profondità albero: " << bit_required  << endl;
 // BitArray bvct{bit_required};
+ */
+struct SymbolTable {
+
+    protected:
+        static std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root);
+
+    public:
+        SymbolTable() = default;
+        SymbolTable(std::shared_ptr<const std::vector<BitArray>> self): m_self{self} {}
+        explicit SymbolTable(const HuffmanTree &tree): SymbolTable{ SymbolTable::build_symbol_table(tree.root()) } {}
+
+        inline const auto & borrow() const { return *m_self; }
+        inline auto share() const { return m_self; }
+
+        void print() const;
+        // const BitArray & operator[](sym) const {}
+
+        InverseSymbolTable inverse_symbol_table() const {
+            return InverseSymbolTable{*m_self};
+        }
+
+    protected:
+        std::shared_ptr<const std::vector<BitArray>> m_self;
+
+};
+
+
 
 // compute a prefix free code using iterative dfs subtree in pre-order
 // return an array of 256 elements in which every element is a BitArray
 // vector<bits>[256] -> map[sym] = huffman_code
-std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root) {
+std::shared_ptr<std::vector<BitArray>> SymbolTable::build_symbol_table(const HuffmanNode *root) {
 
     using HuffmanNode::CHILD_LEFT, HuffmanNode::CHILD_RIGHT, std::pair, std::vector; // C++20
 
@@ -57,8 +86,9 @@ std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *roo
 }
 
 
-static void print_symbol_table(const std::vector<BitArray> &symbol_table) {
+void SymbolTable::print() const {
 
+    const auto &symbol_table = *m_self;
     for (unsigned i = 0; i < symbol_table.size(); ++i) {
 
         const auto &bit_v = symbol_table[i];

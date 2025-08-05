@@ -23,6 +23,8 @@ struct ShannonHistogram: public Histogram {
         double self_information;
     };
 
+    ShannonHistogram() = default;
+
     explicit ShannonHistogram(const uint8_t *data, uint64_t len): Histogram{data, len}, m_original_dataset_length{len} {
 
         // This calculates the first-order entropy, which is approximate because it doesn't take into account the dependencies between symbols.

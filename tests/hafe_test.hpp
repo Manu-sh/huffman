@@ -6,6 +6,7 @@
 #include <encode_decode.hpp>
 #include <HuffmanTree.hpp>
 #include <Histogram.hpp>
+#include <SymbolTable.hpp>
 #include <bitarray/BitArray.hpp>
 
 
@@ -137,7 +138,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        // SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -176,7 +177,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        // SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -215,7 +216,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        // SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -252,7 +253,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        // SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -290,7 +291,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        // SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -328,7 +329,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        // SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -366,7 +367,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        // SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -405,7 +406,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        //SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);
@@ -444,7 +445,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         const auto &symbol_table = *shp_sym_tab;
 
         REQUIRE(shp_sym_tab != nullptr);
-        print_symbol_table(symbol_table);
+        //SymbolTable::print_symbol_table(symbol_table);
 
         auto shp_bitstream = hafe.bitstream();
         REQUIRE(shp_bitstream != nullptr);

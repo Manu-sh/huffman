@@ -63,6 +63,7 @@ struct Histogram {
             uint16_t m_index = -1;
     };
 
+    Histogram() = default;
     explicit Histogram(const uint8_t *data, uint64_t len) {
 
         if (std::numeric_limits<decltype(len)>::max() == len)

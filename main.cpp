@@ -4,10 +4,10 @@
 #include <cctype>
 #include <cassert>
 
-#include <encode_decode.hpp>
 #include <HuffmanTree.hpp>
 #include <Histogram.hpp>
 #include <ShannonHistogram.hpp>
+#include <SymbolTable.hpp>
 #include <bitarray/BitArray.hpp>
 
 #include <hafe_file_format/Hafe.hpp>
@@ -16,6 +16,8 @@
 #include <vector>
 #include <cmath>
 
+#include <encoder/Encoder.hpp>
+#include <decoder/Decoder.hpp>
 
 /*
 
@@ -51,26 +53,19 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
 
     if (mode == COMPRESS) { // compress a binary file
 
-        // TODO: manca un'interfaccia di più alto livello che crei l'albero e la symbol table
         auto str = stream_content(std::cin);
+        Encoder encoder{str};
 
-        ShannonHistogram freq{(uint8_t *)str.data(), str.length()};
-        auto tree = HuffmanTree(freq);
-        auto shp_sym_tab = tree.symbol_table();
+        const auto &freq  = encoder.shannon_histogram();
+        auto symbol_table = encoder.symbol_table();
 
-        std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
-        std::shared_ptr<BitArray> shp_bitstream = make_shared<BitArray>(encode(symbol_table, str));
-
-        assert(shp_sym_tab);
-        assert(shp_bitstream);
-
-        Hafe hafe{shp_sym_tab, shp_bitstream};
+        Hafe hafe = encoder.hafe();
         hafe.write(std::cout);
 
     } else { // decompress
 
         // TODO: decompress è lentissimo
-
+/*
         Hafe hafe{std::cin};
         auto shp_sym_tab = hafe.symbol_table();
         const auto &symbol_table = *shp_sym_tab;
@@ -83,6 +78,18 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
 
         auto str = decode(symbol_table, *shp_bitstream);
         std::cout.write((char *)str.data(), str.length());
+*/
+        Hafe hafe{std::cin};
+        Decoder decoder{hafe};
+
+        const auto &symbol_table = decoder.symbol_table();
+        //print_symbol_table(symbol_table);
+
+        auto bitstream = decoder.bitstream();
+
+        //auto str = decode(symbol_table, bitstream);
+        //std::cout.write((char *)str.data(), str.length());
+        std::cout.write((char *)decoder.str().data(), decoder.str().length());
     }
 
 }

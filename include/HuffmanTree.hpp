@@ -7,19 +7,20 @@
 #include <bitarray/BitArray.hpp>
 #include <Histogram.hpp>
 #include <HuffmanNode.hpp>
-#include <huffman.hpp>
 
 struct HuffmanTree {
 
+    friend class SymbolTable;
+
+    HuffmanTree() = default;
     explicit HuffmanTree(const Histogram &freq); // standard huffman tree
     //explicit HuffmanTree(const Histogram &freq, uint8_t max_bits); // depth-limited huffman tree (for bit-limited prefix-free-codes)
 
-    inline auto symbol_table() const { return ::build_symbol_table(m_root); }
+    inline const auto root() const { return m_root; }
 
     protected:
         std::vector<std::shared_ptr<HuffmanNode>> gc; // garbage collection
         HuffmanNode *m_root;
-
 };
 
 HuffmanTree::HuffmanTree(const Histogram &histogram) {

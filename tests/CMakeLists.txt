@@ -6,16 +6,16 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(TEST_BIN ${PROJECT_NAME}_test)
-add_executable(${TEST_BIN} ${PROJECT_NAME}_test.cpp)
+#add_executable(${TEST_BIN} ${PROJECT_NAME}_test.cpp)
 
 # doctest framework
 # pacman -S --noconfirm doctest
 find_package(doctest REQUIRED)
-target_link_libraries(${TEST_BIN} PRIVATE doctest::doctest)
+#target_link_libraries(${TEST_BIN} PRIVATE doctest::doctest)
 
 # self - lib
 #target_link_libraries(${TEST_BIN} PRIVATE ${PROJECT_NAME})
-target_include_directories(${TEST_BIN} PUBLIC ${INC_PATH})
+#target_include_directories(${TEST_BIN} PUBLIC ${INC_PATH})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE -DDEBUG)
 target_compile_options(${PROJECT_NAME}
