@@ -1,10 +1,13 @@
 #pragma once
 #include <cstdint>
+#include <cmath>
+#include <cstddef>
 #include <stdexcept>
 #include <limits>
 #include <iterator>
-#include <cstddef>
 #include <utility>
+
+#include <bitarray/BitArray.hpp>
 
 // TODO: eventualmente estendere la classe per includere il calcolo delle probabilità, la stima dei bit frazionati etc
 struct Histogram {
@@ -64,6 +67,7 @@ struct Histogram {
     };
 
     Histogram() = default;
+
     explicit Histogram(const uint8_t *data, uint64_t len) {
 
         if (std::numeric_limits<decltype(len)>::max() == len)
@@ -83,7 +87,7 @@ struct Histogram {
         return m_frequency[ symbol ];
     }
 
-    private:
+    protected:
         uint32_t m_frequency[256] {};
 };
 

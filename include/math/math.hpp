@@ -17,6 +17,12 @@ static FORCED(inline) double compression_rateo(uint64_t compressed_len, uint64_t
     return 100. * compressed_len / uncompressed_len;
 }
 
+
+static FORCED(inline) double shannon_probability(uint64_t huffman_code_length) noexcept {
+    // return 1.0 / std::pow<double>(2, huffman_code_length); // division lead precision issues here
+    return std::pow<double>(2, -huffman_code_length);
+}
+
 static FORCED(inline) double shannon_probability(uint64_t frequency, uint64_t length) noexcept {
     assert(length > 0);
     return double(frequency) / length;
@@ -24,7 +30,7 @@ static FORCED(inline) double shannon_probability(uint64_t frequency, uint64_t le
 
 static FORCED(inline) double shannon_self_information(double probability) noexcept {
     assert(probability > 0);
-    return std::log2(1 / probability);
+    return std::log2(1 / probability); // return std::log2(std::pow<double>(2, -probability));
 }
 
 /*

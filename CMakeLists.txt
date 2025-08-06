@@ -24,9 +24,7 @@ list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 
 add_executable(${PROJECT_NAME} main.cpp)
 
-target_link_libraries(${PROJECT_NAME}
-        -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable
-)
+target_link_libraries(${PROJECT_NAME} -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INC_PATH})
 target_compile_options(${PROJECT_NAME}

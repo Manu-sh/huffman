@@ -1,12 +1,15 @@
 #pragma once
-#include <Histogram.hpp>
-#include <math/math.hpp>
 
 #include <cstdint>
 #include <cmath>
 #include <cctype>
 #include <iomanip>
 #include <iostream>
+#include <memory>
+#include <vector>
+
+#include <Histogram.hpp>
+#include <math/math.hpp>
 
 // this class only store "useless" stats that can be useful for debug etc, to compute huffman all you need is Histogram
 struct ShannonHistogram: public Histogram {
@@ -25,6 +28,29 @@ struct ShannonHistogram: public Histogram {
 
     ShannonHistogram() = default;
 
+    /* Con le lunghezze dei vari codici di huffman e la lunghezza dell'input originale non compresso
+        posso risalire alle frequenze e costruire uno shannon histogram
+
+        using (symbol, huffman_code.length()) with the length of the original uncompressed input
+        is possible gets back: probability, frequency, self_information of given symbol.
+     */
+    explicit ShannonHistogram(const std::vector<BitArray> &symbol_table, uint64_t uncompressed_input_length)
+        : m_original_dataset_length{uncompressed_input_length} {
+
+        assert(symbol_table.size() == 256);
+
+        m_avg_bit_per_symbol = 0;
+        for (uint16_t sym = 0; sym < 256; ++sym) {
+            const auto &huffman_code = symbol_table[sym];
+            if (huffman_code.empty()) continue;
+            m_map[sym].probability      = shannon_probability(huffman_code.bit_length());
+            m_map[sym].self_information = shannon_self_information(m_map[sym].probability);
+            m_frequency[sym]            = m_map[sym].probability * m_original_dataset_length; // calc frequency
+        }
+
+        m_total_bits = m_avg_bit_per_symbol * m_original_dataset_length;
+    }
+
     explicit ShannonHistogram(const uint8_t *data, uint64_t len): Histogram{data, len}, m_original_dataset_length{len} {
 
         // This calculates the first-order entropy, which is approximate because it doesn't take into account the dependencies between symbols.
@@ -41,6 +67,16 @@ struct ShannonHistogram: public Histogram {
     inline double avg_bit_per_symbol() const noexcept { return m_avg_bit_per_symbol; }                  // average in how many bit you can encode each symbol
     inline double         total_bits() const noexcept { return m_total_bits; }                          // minimum number of bits required to encode the dataset
     inline uint64_t      total_bytes() const noexcept { return uint64_t(std::ceil(m_total_bits / 8)); } // minimum number of bytes required to encode the dataset
+
+
+    inline double probability(uint8_t sym) const noexcept {
+        return m_map[sym].probability;
+    }
+
+    inline double information(uint8_t sym) const noexcept {
+        return m_map[sym].self_information;
+    }
+
 
     // TODO: eventualmente usare una std::multimap e definire una relazione d'ordine in base alle frequenze oppure ordinare e basta
     void dump_entry(uint8_t symbol) const {

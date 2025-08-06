@@ -2,9 +2,9 @@
 #include <cstdint>
 #include <vector>
 #include <utility>
+#include <memory>
 
 #include <bitarray/BitArray.hpp>
-#include <SymbolTable.hpp>
 
 struct InverseSymbolTable final { // faster than unordered_map
 
@@ -23,50 +23,22 @@ struct InverseSymbolTable final { // faster than unordered_map
     }
 
     private:
-        struct HashPrefixCode final {
-
-            // prefix-code più lunghi sono meno frequenti, per cui bisogna cercare distribuire le collisioni su elementi lunghi
-            // anzichè usare una distribuzione uniforme come (x+1)%256 ovvero x^(256-1)
-            // bisogna andare su una distribuzione pesata con pesi inversamente proporzionali alla lunghezza del prefix-code
-            // x ^ log2(prefix.bit_length) ovvero -> (x+1) % log2(prefix.bit_length)
-
-            FORCED(inline) std::size_t operator()(const BitArray &prefix_code) const noexcept {
-                //return std::hash<uint8_t>()( (uint8_t)prefix_code.back_byte() ) ^ std::hash<uint64_t>()( prefix_code.bit_length() );
-                //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
-
-                //return (uint8_t)prefix_code.back_byte() ^ (uint64_t)log2(prefix_code.bit_length());
-                //return (uint8_t(prefix_code.back_byte())+1) % floor_log2(prefix_code.bit_length());
-                //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
-
-                //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) ^ prefix_code.bit_length();
-                //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) % 256;
-
-                // return ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ prefix_code.bit_length();
-                //return ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ 255;
-                //return ::hash_murmur_oaat64((void *)&prefix_code.back_byte(), 1) ^ 255;
-
-                //return (uint8_t)prefix_code.back_byte() ^ 255;
-
-                //return (uint8_t)prefix_code.back_byte() ^ prefix_code.bit_length();
-                //return (uint8_t)prefix_code.back_byte() % (floor_log2(prefix_code.bit_length() + 1) + 1);
-                //return (uint8_t)prefix_code.back_byte() ^ (floor_log2(prefix_code.bit_length() + 1) + 1);
-                //return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) % (floor_log2(prefix_code.bit_length() + 1) + 1);
-                // return  ::hash_murmur_oaat64((void *)prefix_code.m_vct.data(), prefix_code.effective_byte_size()) ^ (floor_log2(prefix_code.bit_length() + 1) + 1);
-
-                return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
-            }
-        };
-
-        using Bucket = std::vector<std::pair<BitArray, uint8_t>>;
-        static const HashPrefixCode prefix_code_hash;
-
         friend class SymbolTable;
-        friend class Decoder;
+        using Bucket = std::vector<std::pair<BitArray, uint8_t>>;
+
+        // prefix-code più lunghi sono meno frequenti, per cui bisogna cercare distribuire le collisioni su elementi lunghi
+        // anziché usare una distribuzione uniforme come x %256 ovvero x&(256-1)
+        // bisogna andare su una distribuzione pesata con pesi inversamente proporzionali alla lunghezza del prefix-code
+        // x % log2(prefix.bit_length), nonostante i molti hash provati questo è quello che si comporta meglio
+
+        static FORCED(inline) uint64_t prefix_code_hash(const BitArray &prefix_code) {
+            return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
+        }
 
         InverseSymbolTable() = delete;
-        InverseSymbolTable(const SymbolTable &st) {
+        InverseSymbolTable(std::shared_ptr<std::vector<BitArray>> shp_symbol_table) {
 
-            const auto &symbol_table = st.borrow();
+            const auto &symbol_table = *shp_symbol_table;
             for (uint64_t i = 0, len = symbol_table.size(); i < len; ++i) {
                 if (symbol_table[i].empty()) continue;
                 this->insert_unique(symbol_table[i], i);
@@ -83,5 +55,3 @@ struct InverseSymbolTable final { // faster than unordered_map
         std::vector<Bucket> buckets{256};
 
 };
-
-const InverseSymbolTable::HashPrefixCode InverseSymbolTable::prefix_code_hash;

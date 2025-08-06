@@ -116,12 +116,27 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         // compress
         std::string str = file_content(file_uncompressed);
-        Histogram freq{(uint8_t *)str.data(), str.length()};
+        //Histogram freq{(uint8_t *)str.data(), str.length()};
+        ShannonHistogram freq{(uint8_t *)str.data(), str.length()};
 
         auto tree = HuffmanTree(freq);
         SymbolTable st{tree};
 
         const auto &symbol_table = st.borrow();
+        {
+            ShannonHistogram recalc{symbol_table, str.length()};
+            for (auto [s, f] : recalc) {
+                REQUIRE(freq.probability(s) == recalc.probability(s));
+                REQUIRE(freq.information(s) == recalc.information(s));
+                REQUIRE(freq[s] == recalc[s]);
+                REQUIRE(freq.information(s) == recalc.information(s));
+                REQUIRE(freq.avg_bit_per_symbol() == recalc.avg_bit_per_symbol());
+                REQUIRE(freq.total_bits() == recalc.total_bits());
+                REQUIRE(freq.total_bytes() == recalc.total_bytes());
+            }
+        }
+
+
         std::shared_ptr<BitArray> shp_bitstream = Encoder::encode(st, str);
 
         REQUIRE(st.share() != nullptr);

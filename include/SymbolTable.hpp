@@ -4,6 +4,7 @@
 
 #include <bitarray/BitArray.hpp>
 #include <HuffmanTree.hpp>
+#include <InverseSymbolTable.hpp>
 
 #include <string>
 #include <forward_list>
@@ -33,10 +34,9 @@ struct SymbolTable {
         void print() const;
         // const BitArray & operator[](sym) const {}
 
-        /*
         InverseSymbolTable inverse_symbol_table() const {
-            return InverseSymbolTable{*this};
-        }*/
+            return InverseSymbolTable{m_self};
+        }
 
     protected:
         std::shared_ptr<std::vector<BitArray>> m_self;

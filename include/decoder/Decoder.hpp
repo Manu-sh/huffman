@@ -14,7 +14,7 @@ struct Decoder {
 
     static std::shared_ptr<std::string> decode(const SymbolTable &symbol_table, const BitArray &encoded) {
 
-        InverseSymbolTable huffman_codes{symbol_table};
+        const InverseSymbolTable &huffman_codes = symbol_table.inverse_symbol_table();
 
         std::ostringstream decoded;
         BitArray token(1000 * 8 * 1);
@@ -39,9 +39,13 @@ struct Decoder {
 
     explicit Decoder(const Hafe &to_decode): Decoder{to_decode.symbol_table(), to_decode.bitstream()} {}
 
-    inline const auto & bitstream()     const { return m_bitstream.borrow();    }
-    inline const auto & symbol_table()  const { return m_symbol_table.borrow(); }
-    inline const auto & str()           const { return *m_str;                  }
+    inline const auto & bitstream()         const { return m_bitstream.borrow();    }
+    inline const auto & symbol_table()      const { return m_symbol_table.borrow(); }
+    inline const auto & str()               const { return *m_str;                  }
+    inline const auto & shannon_histogram() const {
+        static const ShannonHistogram histogram{m_symbol_table.borrow(), m_str->length()};
+        return histogram;
+    }
 
     protected:
         SymbolTable m_symbol_table;
