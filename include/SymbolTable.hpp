@@ -4,7 +4,6 @@
 
 #include <bitarray/BitArray.hpp>
 #include <HuffmanTree.hpp>
-#include <InverseSymbolTable.hpp>
 
 #include <string>
 #include <forward_list>
@@ -24,21 +23,23 @@ struct SymbolTable {
 
     public:
         SymbolTable() = default;
-        SymbolTable(std::shared_ptr<const std::vector<BitArray>> self): m_self{self} {}
+        SymbolTable(std::shared_ptr<std::vector<BitArray>> self): m_self{self} {}
         explicit SymbolTable(const HuffmanTree &tree): SymbolTable{ SymbolTable::build_symbol_table(tree.root()) } {}
 
+        inline auto & mut() const { return *m_self; }
         inline const auto & borrow() const { return *m_self; }
         inline auto share() const { return m_self; }
 
         void print() const;
         // const BitArray & operator[](sym) const {}
 
+        /*
         InverseSymbolTable inverse_symbol_table() const {
             return InverseSymbolTable{*m_self};
-        }
+        }*/
 
     protected:
-        std::shared_ptr<const std::vector<BitArray>> m_self;
+        std::shared_ptr<std::vector<BitArray>> m_self;
 
 };
 

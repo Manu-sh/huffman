@@ -15,24 +15,21 @@ extern "C" {
 
 #include <bitarray/BitArray.hpp>
 #include <bitarray/BitArray8.hpp>
-
+#include <SymbolTable.hpp>
+#include <BitStream.hpp>
 
 // Huffman Archive Format Example .hafe (all integers in little endian)
 struct Hafe {
 
-    // TODO?: di solito però sono per I/O formattato
-    //friend std::ostream & operator<<(std::ostream &os, const HafeHeader &);
-    //friend std::istream & operator>>(std::ostream &is, const HafeHeader &);
-
     static std::shared_ptr<std::vector<BitArray>> read_symbol_table(std::istream &is, uint32_t symbol_table_bsize);
-    static uint32_t calc_symbol_table_disk_size(const std::vector<BitArray> &symbol_table);
-    static void write_symbol_table(std::ostream &os, const std::vector<BitArray> &symbol_table);
+    static uint32_t calc_symbol_table_disk_size(const SymbolTable &st);
+    static void write_symbol_table(std::ostream &os, const SymbolTable &st);
 
     Hafe() = delete;
-    explicit Hafe(std::istream &is) { this->read(is); } // Decode Hafe file
-    explicit Hafe(std::shared_ptr<const std::vector<BitArray>> symbol_table, std::shared_ptr<const BitArray> bit_stream) { // Encode Hafe File
+    explicit Hafe(std::istream &is) { this->read(is); } // Decode stored Hafe file
+    explicit Hafe(const SymbolTable &st, const BitStream &bit_stream) { // Store encoded Hafe File
         memset(m_reserved, 0x1d, sizeof m_reserved); // easy debugging
-        this->symbol_table(symbol_table).bitstream(bit_stream);
+        this->symbol_table(st).bitstream(bit_stream);
     }
 
     void write(std::ostream &os) const;
@@ -41,19 +38,19 @@ struct Hafe {
 
     private:
         // tecnicamente se modifichi la symbol table dovresti modificare anche il bitstream
-        inline Hafe & symbol_table(std::shared_ptr<const std::vector<BitArray>> symbol_table) {
+        inline Hafe & symbol_table(const SymbolTable &st) {
 
-            assert(symbol_table);
+            assert(st.share());
 
-            this->symbol_table_size(Hafe::calc_symbol_table_disk_size(*symbol_table));
-            m_symbol_table = symbol_table;
+            this->symbol_table_size(Hafe::calc_symbol_table_disk_size(st));
+            m_symbol_table = st;
             return *this;
         }
 
-        inline Hafe & bitstream(std::shared_ptr<const BitArray> &bit_stream) {
-            assert(bit_stream);
+        inline Hafe & bitstream(const BitStream &bit_stream) {
+            assert(bit_stream.share());
 
-            bitstream_bitsz(bit_stream->bit_length());
+            bitstream_bitsz(bit_stream.borrow().bit_length());
             m_bit_stream = bit_stream;
             return *this;
         }
@@ -81,11 +78,11 @@ struct Hafe {
         uint32_t m_symbol_table_bsize; // TODO: empty rows aren't stored on disk but they must be accessible later)
 
         // SymTable
-        std::shared_ptr<const std::vector<BitArray>> m_symbol_table;
+        SymbolTable m_symbol_table;
 
         // Bottom
         uint64_t m_bitstream_bitsz;
-        std::shared_ptr<const BitArray> m_bit_stream;
+        BitStream m_bit_stream;
 };
 
 
@@ -121,13 +118,14 @@ void Hafe::read(std::istream &is) {
         throw std::runtime_error{"incomplete bitstream"};
 
     // change the ownership of bit_stream and tell BitArray to use it as internal buffer (avoid realloc copy etc)
-    m_bit_stream = std::make_shared<BitArray>(std::move(bit_stream), this->bitstream_bitsz());
+    //m_bit_stream = std::make_shared<BitArray>(std::move(bit_stream), this->bitstream_bitsz());
+    m_bit_stream = BitStream{ std::make_shared<BitArray>(std::move(bit_stream), this->bitstream_bitsz()) };
 }
 
 
 void Hafe::write(std::ostream &os) const {
 
-    if (!m_symbol_table || !m_bit_stream)
+    if (!m_symbol_table.share() || !m_bit_stream.share())
         throw std::runtime_error{"incomplete format, pls set symbol table and bitstream before calling Hafe::write()"};
 
     // write magic
@@ -140,13 +138,13 @@ void Hafe::write(std::ostream &os) const {
         throw std::runtime_error{"error writing reserved bytes"};
 
     // write symbol table
-    write_symbol_table(os, *m_symbol_table);
+    write_symbol_table(os, m_symbol_table);
 
     // write the bitstream size in bits
     if (!os.write((char *)&m_bitstream_bitsz, sizeof m_bitstream_bitsz))
         throw std::runtime_error{"error writing reserved bytes"};
 
-    if (!os.write((char *)m_bit_stream->bitstream(), m_bit_stream->effective_byte_size()))
+    if (!os.write((char *)m_bit_stream.borrow().bitstream(), m_bit_stream.borrow().effective_byte_size()))
         throw std::runtime_error{"error writing the bitstream"};
 }
 
@@ -212,7 +210,9 @@ std::shared_ptr<std::vector<BitArray>> Hafe::read_symbol_table(std::istream &is,
     return shp_sym_table;
 }
 
-uint32_t Hafe::calc_symbol_table_disk_size(const std::vector<BitArray> &symbol_table) {
+uint32_t Hafe::calc_symbol_table_disk_size(const SymbolTable &st) {
+
+    const auto &symbol_table = st.borrow();
 
     uint32_t bsize = 0;
     for (unsigned sym = 0; sym < 256; ++sym) {
@@ -228,7 +228,9 @@ uint32_t Hafe::calc_symbol_table_disk_size(const std::vector<BitArray> &symbol_t
 }
 
 
-void Hafe::write_symbol_table(std::ostream &os, const std::vector<BitArray> &symbol_table) {
+void Hafe::write_symbol_table(std::ostream &os, const SymbolTable &st) {
+
+    const auto &symbol_table = st.borrow();
 
     // TODO: non è detto che le eccezioni siano abilitate sullo stream che leggo
     using std::ios_base;
@@ -238,7 +240,7 @@ void Hafe::write_symbol_table(std::ostream &os, const std::vector<BitArray> &sym
 #ifdef DBG_HAFE_BIG_ENDIAN
     uint32_t symbol_table_bsize = htobe32(Hafe::calc_symbol_table_disk_size(symbol_table));
 #else
-    uint32_t symbol_table_bsize = htole32(Hafe::calc_symbol_table_disk_size(symbol_table));
+    uint32_t symbol_table_bsize = htole32(Hafe::calc_symbol_table_disk_size(st));
 #endif
 
     if (!os.write((char *)&symbol_table_bsize, sizeof(uint32_t)))

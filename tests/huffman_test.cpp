@@ -2,9 +2,11 @@
 #include <doctest/doctest.h>
 
 #include <common.hpp>
-#include <encode_decode.hpp>
 #include <HuffmanTree.hpp>
 #include <Histogram.hpp>
+#include <SymbolTable.hpp>
+#include <encoder/Encoder.hpp>
+#include <decoder/Decoder.hpp>
 #include <bitarray/BitArray.hpp>
 
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
@@ -14,20 +16,25 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 #include "bitarray_test.hpp"
-#include "hafe_test.hpp"
+#include "old_hafe_test.hpp"
+#include "encoder_decoder_test.hpp"
 
 using namespace std;
 
 TEST_CASE("testing huffman on strings") {
 
     static const auto try_decode = [] (const std::string &str) -> void {
+
         Histogram freq{(uint8_t *)str.data(), str.length()};
 
         auto tree = HuffmanTree(freq);
-        auto shp_sym_tab = tree.symbol_table();
-        std::vector<BitArray> &symbol_table = *shp_sym_tab.get();
+        SymbolTable st{tree};
 
-        REQUIRE(str == decode(symbol_table, encode(symbol_table, str)));
+        const std::vector<BitArray> &symbol_table = st.borrow();
+
+        auto shp_encoded = Encoder::encode(st, str);
+        auto shp_decoded = Decoder::decode(st, *shp_encoded);
+        REQUIRE(str == *shp_decoded);
     };
 
     try_decode("il mio angolo di cielo e un triangolo di pelo");

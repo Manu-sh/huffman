@@ -64,7 +64,6 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
 
     } else { // decompress
 
-        // TODO: decompress è lentissimo
 /*
         Hafe hafe{std::cin};
         auto shp_sym_tab = hafe.symbol_table();

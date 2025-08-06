@@ -7,11 +7,12 @@
 #include <HuffmanTree.hpp>
 #include <BitStream.hpp>
 #include <SymbolTable.hpp>
+#include <InverseSymbolTable.hpp>
 
 
 struct Decoder {
 
-    static std::shared_ptr<std::string> decode(const std::vector<BitArray> &symbol_table, const BitArray &encoded) {
+    static std::shared_ptr<std::string> decode(const SymbolTable &symbol_table, const BitArray &encoded) {
 
         InverseSymbolTable huffman_codes{symbol_table};
 
@@ -30,10 +31,10 @@ struct Decoder {
         return std::make_shared<std::string>( std::move(decoded.str()) );
     }
 
-    explicit Decoder(SymbolTable symbol_table, BitStream encoded) {
-        this->m_symbol_table  = symbol_table;
-        this->m_bitstream     = encoded;
-        this->m_str           = Decoder::decode(m_symbol_table.borrow(), m_bitstream.borrow());
+    explicit Decoder(const SymbolTable &symbol_table, const BitStream &encoded)
+        : m_symbol_table{symbol_table}, m_bitstream{encoded} {
+
+        this->m_str  = Decoder::decode(m_symbol_table, m_bitstream.borrow());
     }
 
     explicit Decoder(const Hafe &to_decode): Decoder{to_decode.symbol_table(), to_decode.bitstream()} {}

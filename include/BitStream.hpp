@@ -7,7 +7,7 @@ struct BitStream {
 
     public:
         BitStream() = default;
-        BitStream(std::shared_ptr<const BitArray> self): m_self{self} {}
+        BitStream(std::shared_ptr<BitArray> self): m_self{self} {}
 
         //explicit BitStream(const std::string &to_encode)
 
@@ -15,5 +15,5 @@ struct BitStream {
         inline auto share() const { return m_self; }
 
     protected:
-        std::shared_ptr<const BitArray> m_self;
+        std::shared_ptr<BitArray> m_self;
 };

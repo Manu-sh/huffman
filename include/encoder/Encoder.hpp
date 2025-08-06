@@ -15,10 +15,11 @@ static std::ostream & print_compression_stats(const BitArray &compressed, const 
 */
 struct Encoder {
 
-    static std::shared_ptr<BitArray> encode(const std::vector<BitArray> &symbol_table, const std::string &str) {
+    static std::shared_ptr<BitArray> encode(const SymbolTable &st, const std::string &str) {
 
         auto shp_encoded = std::make_shared<BitArray>();
         auto &encoded = *shp_encoded;
+        const std::vector<BitArray> &symbol_table = st.borrow();
 
         for (uint8_t ch : str)
             encoded += symbol_table[ch];
@@ -30,7 +31,7 @@ struct Encoder {
     explicit Encoder(const std::string &str) {
         this->m_histogram     = ShannonHistogram{(uint8_t *)str.data(), str.length()};
         this->m_symbol_table  = SymbolTable{ HuffmanTree{m_histogram} };
-        this->m_bitstream     = BitStream{ encode(m_symbol_table.borrow(), str) };
+        this->m_bitstream     = BitStream{ encode(m_symbol_table, str) };
     }
 
     inline const auto & shannon_histogram() const { return m_histogram;    }
@@ -44,5 +45,5 @@ struct Encoder {
     protected:
         ShannonHistogram m_histogram;
         SymbolTable m_symbol_table;
-        BitStream m_bitstream{nullptr}; // encoded bitstream
+        BitStream m_bitstream; // encoded bitstream
 };

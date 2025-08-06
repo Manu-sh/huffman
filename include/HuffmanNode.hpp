@@ -13,8 +13,6 @@ struct HuffmanNode final {
 
     friend class SymbolTable;
 
-    //friend std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root);
-
     enum: uint8_t {
         CHILD_LEFT,
         CHILD_RIGHT,

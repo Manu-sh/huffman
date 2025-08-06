@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <bitarray/BitArray.hpp>
+#include <SymbolTable.hpp>
 
 struct InverseSymbolTable final { // faster than unordered_map
 
@@ -61,11 +62,11 @@ struct InverseSymbolTable final { // faster than unordered_map
 
         friend class SymbolTable;
         friend class Decoder;
-        friend std::string decode(const std::vector<BitArray> &symbol_table, const BitArray &encoded);
 
         InverseSymbolTable() = delete;
-        InverseSymbolTable(const std::vector<BitArray> &symbol_table) {
+        InverseSymbolTable(const SymbolTable &st) {
 
+            const auto &symbol_table = st.borrow();
             for (uint64_t i = 0, len = symbol_table.size(); i < len; ++i) {
                 if (symbol_table[i].empty()) continue;
                 this->insert_unique(symbol_table[i], i);
