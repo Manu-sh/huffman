@@ -35,7 +35,7 @@ struct SymbolTable {
 
         /*
         InverseSymbolTable inverse_symbol_table() const {
-            return InverseSymbolTable{*m_self};
+            return InverseSymbolTable{*this};
         }*/
 
     protected:

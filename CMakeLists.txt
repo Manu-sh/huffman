@@ -24,13 +24,21 @@ list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 
 add_executable(${PROJECT_NAME} main.cpp)
 
+target_link_libraries(${PROJECT_NAME}
+        -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable
+)
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${INC_PATH})
 target_compile_options(${PROJECT_NAME}
     PRIVATE
         -pedantic
         -Wall -Wextra -Wno-unused-function -pipe
+        #-D_FORTIFY_SOURCE=2
+        -ftrapv
         -fstack-protector-all -fstack-protector-strong
-        -O0 -g
+        -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable
+        -g3 -fno-omit-frame-pointer
+        -O0
         #-O3 -ffast-math -funroll-loops -march=native -mtune=native
         #-funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
 )

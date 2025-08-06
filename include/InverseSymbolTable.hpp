@@ -71,6 +71,7 @@ struct InverseSymbolTable final { // faster than unordered_map
                 if (symbol_table[i].empty()) continue;
                 this->insert_unique(symbol_table[i], i);
             }
+
         }
 
         void insert_unique(const BitArray &huffman_code, uint8_t symbol) {
@@ -82,3 +83,5 @@ struct InverseSymbolTable final { // faster than unordered_map
         std::vector<Bucket> buckets{256};
 
 };
+
+const InverseSymbolTable::HashPrefixCode InverseSymbolTable::prefix_code_hash;

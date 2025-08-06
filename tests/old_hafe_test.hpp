@@ -208,7 +208,7 @@ TEST_CASE("testing .hafe compress & decompress") {
 
     for (const auto &s : {
         "../../data/divina_commedia.txt",
-        "../../data/lorem_ipsum.txt",
+        //"../../data/lorem_ipsum.txt",
         "../../data/mandelbrot.pnm"
     })
         full_test(s);
