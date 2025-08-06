@@ -6,7 +6,6 @@
 #include <memory>
 #include <vector>
 
-#include <bitarray/BitArray.hpp>
 #include <HuffmanNode.hpp>
 
 struct HuffmanNode final {

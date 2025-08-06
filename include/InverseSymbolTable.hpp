@@ -5,15 +5,12 @@
 #include <memory>
 #include <cstdlib>
 
-#include <bitarray/BitArray.hpp>
-
-static constexpr uint32_t pow2(uint8_t exp) {
-    return 2 << (exp - 1);
-}
+#include <HuffmanCode.hpp>
+#include <math/math.hpp>
 
 struct InverseSymbolTable final { // faster than unordered_map
 
-    const uint8_t * find(const BitArray &huffman_code) const noexcept {
+    const uint8_t * find(const HuffmanCode &huffman_code) const noexcept {
 
         const uint16_t idx = prefix_code_hash(huffman_code) & (BUCKET_SIZE-1);
         const Bucket &bucket = m_buckets[idx];
@@ -30,7 +27,7 @@ struct InverseSymbolTable final { // faster than unordered_map
     private:
 
         friend class SymbolTable;
-        using Bucket = std::vector<std::pair<BitArray, uint8_t>>;
+        using Bucket = std::vector<std::pair<HuffmanCode, uint8_t>>;
         // TODO: questi sono 40 byte a botta, sicuramente i prefix-code sono lunghi al massimo 256
         //  creare una classe/alias prefix-code rendere BitArray Template sulla lunghezza?
 
@@ -52,12 +49,12 @@ struct InverseSymbolTable final { // faster than unordered_map
             x % log2(prefix.bit_length), despite the many hashes we've tried, this one performs best.
         */
 
-        static FORCED(inline) uint64_t prefix_code_hash(const BitArray &prefix_code) {
+        static FORCED(inline) uint64_t prefix_code_hash(const HuffmanCode &prefix_code) {
             return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
         }
 
         InverseSymbolTable() = delete;
-        InverseSymbolTable(std::shared_ptr<std::vector<BitArray>> shp_symbol_table) {
+        InverseSymbolTable(std::shared_ptr<std::vector<HuffmanCode>> shp_symbol_table) {
             const auto &symbol_table = *shp_symbol_table;
             for (uint64_t i = 0, len = symbol_table.size(); i < len; ++i) {
                 if (symbol_table[i].empty()) continue;
@@ -66,7 +63,7 @@ struct InverseSymbolTable final { // faster than unordered_map
 
         }
 
-        void insert_unique(const BitArray &huffman_code, uint8_t symbol) {
+        void insert_unique(const HuffmanCode &huffman_code, uint8_t symbol) {
             const uint16_t idx = prefix_code_hash(huffman_code) & (BUCKET_SIZE-1);
             m_buckets[idx].emplace_back(huffman_code, symbol);
         }

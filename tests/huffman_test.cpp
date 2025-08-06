@@ -13,6 +13,7 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <iostream>
 #include <string>
 #include <cstdint>
+#include <limits>
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 #include "bitarray_test.hpp"
@@ -30,7 +31,7 @@ TEST_CASE("testing huffman on strings") {
         auto tree = HuffmanTree(freq);
         SymbolTable st{tree};
 
-        const std::vector<BitArray> &symbol_table = st.borrow();
+        const std::vector<HuffmanCode> &symbol_table = st.borrow();
 
         auto shp_encoded = Encoder::encode(st, str);
         auto shp_decoded = Decoder::decode(st, *shp_encoded);
@@ -45,6 +46,42 @@ TEST_CASE("testing huffman on strings") {
     try_decode("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbccccccccccccddddddddddddddddddddddddeeeeeeeeefffff");
 
     //try_decode(file_content("../../data/divina_commedia.txt"));
+}
+
+
+TEST_CASE("testing ") {
+
+    {
+        Histogram fake_freq;
+
+        for (int i = 0; i < 128; ++i) {
+            //fake_freq.m_frequency[i] = std::numeric_limits<decltype(fake_freq.m_frequency[0])>::max() - 1;
+            //fake_freq.m_frequency[i] = std::numeric_limits<uint32_t>::max() - 1;
+            fake_freq.m_frequency[i] = (i + 1) * 1;
+        }
+
+        //fake_freq.m_frequency[0] = 1;
+        fake_freq.m_frequency[0] = std::numeric_limits<uint32_t>::max() - 1;
+        auto tree = HuffmanTree(fake_freq);
+
+        SymbolTable st{tree};
+        st.print();
+    }
+
+
+    {
+        // compress
+        std::string str = file_content("../../data/divina_commedia.txt");
+        ShannonHistogram freq{(uint8_t *) str.data(), str.length()};
+
+        auto tree = HuffmanTree(freq);
+        SymbolTable st{tree};
+        //st.print();
+        //freq.dump_entry(0xb6);
+
+    }
+
+
 }
 
 int main(int argc, char *argv[]) {

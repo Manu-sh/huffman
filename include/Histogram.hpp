@@ -7,7 +7,6 @@
 #include <iterator>
 #include <utility>
 
-#include <bitarray/BitArray.hpp>
 
 // TODO: eventualmente estendere la classe per includere il calcolo delle probabilità, la stima dei bit frazionati etc
 struct Histogram {
@@ -87,7 +86,7 @@ struct Histogram {
         return m_frequency[ symbol ];
     }
 
-    protected:
+    public:
         uint32_t m_frequency[256] {};
 };
 

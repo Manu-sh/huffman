@@ -4,7 +4,6 @@
 #include <vector>
 #include <queue>
 
-#include <bitarray/BitArray.hpp>
 #include <Histogram.hpp>
 #include <HuffmanNode.hpp>
 
@@ -16,7 +15,7 @@ struct HuffmanTree {
     explicit HuffmanTree(const Histogram &freq); // standard huffman tree
     //explicit HuffmanTree(const Histogram &freq, uint8_t max_bits); // depth-limited huffman tree (for bit-limited prefix-free-codes)
 
-    inline const auto root() const { return m_root; }
+    inline const HuffmanNode * root() const { return m_root; }
 
     protected:
         std::vector<std::shared_ptr<HuffmanNode>> gc; // garbage collection
@@ -41,8 +40,10 @@ HuffmanTree::HuffmanTree(const Histogram &histogram) {
     static constexpr auto pqueue_cmp = [](const HuffmanNode *a, const HuffmanNode *b) -> bool { return a->freq() > b->freq(); };
     using PQueue = std::priority_queue<HuffmanNode*, std::vector<HuffmanNode*>, decltype(pqueue_cmp)>;
 
-    for (auto [symbol, frequency] : histogram)
+    for (auto [symbol, frequency] : histogram) {
+        assert(frequency > 0);
         gc.push_back(std::make_shared<HuffmanNode>(symbol, frequency));
+    }
 
     PQueue pq(pqueue_cmp);
     for (auto shp : gc)

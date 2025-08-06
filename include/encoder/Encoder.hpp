@@ -19,7 +19,7 @@ struct Encoder {
 
         auto shp_encoded = std::make_shared<BitArray>();
         auto &encoded = *shp_encoded;
-        const std::vector<BitArray> &symbol_table = st.borrow();
+        const std::vector<HuffmanCode> &symbol_table = st.borrow();
 
         for (uint8_t ch : str)
             encoded += symbol_table[ch];

@@ -2,9 +2,9 @@
 #include <memory>
 #include <vector>
 
-#include <bitarray/BitArray.hpp>
 #include <HuffmanTree.hpp>
 #include <InverseSymbolTable.hpp>
+#include <HuffmanCode.hpp>
 
 #include <string>
 #include <forward_list>
@@ -20,11 +20,11 @@
 struct SymbolTable {
 
     protected:
-        static std::shared_ptr<std::vector<BitArray>> build_symbol_table(const HuffmanNode *root);
+        static std::shared_ptr<std::vector<HuffmanCode>> build_symbol_table(const HuffmanNode *root);
 
     public:
         SymbolTable() = default;
-        SymbolTable(std::shared_ptr<std::vector<BitArray>> self): m_self{self} {}
+        SymbolTable(std::shared_ptr<std::vector<HuffmanCode>> self): m_self{self} {}
         explicit SymbolTable(const HuffmanTree &tree): SymbolTable{ SymbolTable::build_symbol_table(tree.root()) } {}
 
         inline auto & mut() const { return *m_self; }
@@ -39,7 +39,7 @@ struct SymbolTable {
         }
 
     protected:
-        std::shared_ptr<std::vector<BitArray>> m_self;
+        std::shared_ptr<std::vector<HuffmanCode>> m_self;
 
 };
 
@@ -48,12 +48,12 @@ struct SymbolTable {
 // compute a prefix free code using iterative dfs subtree in pre-order
 // return an array of 256 elements in which every element is a BitArray
 // vector<bits>[256] -> map[sym] = huffman_code
-std::shared_ptr<std::vector<BitArray>> SymbolTable::build_symbol_table(const HuffmanNode *root) {
+std::shared_ptr<std::vector<HuffmanCode>> SymbolTable::build_symbol_table(const HuffmanNode *root) {
 
     using HuffmanNode::CHILD_LEFT, HuffmanNode::CHILD_RIGHT, std::pair, std::vector; // C++20
 
-    std::forward_list<pair<const HuffmanNode *, BitArray>> open; // a stack
-    auto shp_symbol_table = std::make_shared<vector<BitArray>>(256);
+    std::forward_list<pair<const HuffmanNode *, HuffmanCode>> open; // a stack
+    auto shp_symbol_table = std::make_shared<vector<HuffmanCode>>(256);
     auto &huffman_code = *shp_symbol_table.get();
 
     if (root->is_leaf()) {
@@ -61,7 +61,7 @@ std::shared_ptr<std::vector<BitArray>> SymbolTable::build_symbol_table(const Huf
         return shp_symbol_table;
     }
 
-    for (open.push_front({root, BitArray{}}); !open.empty();) {
+    for (open.push_front({root, HuffmanCode{}}); !open.empty();) {
 
         auto [node, path] = open.front(); // path is a list of edges in binary (left=0, right=1)
         open.pop_front();

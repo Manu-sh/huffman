@@ -84,6 +84,8 @@ struct BitArray {
 
     explicit BitArray(std::vector<BitArray8> &&moveable_vector, uint64_t bit_length) {
 
+        //assert(moveable_vector.size() < std::numeric_limits<uint64_t>::max());
+
         // required_bytes can be < byte_length the user can provide a bigger chunk and ask to read only few bits
         // but the user can also ask to read 23 bits which require 3 bytes ceil(bits / 8)
         uint64_t required_bytes = bytes_required(bit_length);
@@ -134,7 +136,7 @@ struct BitArray {
         bool skip_last_byte = 0;
 
         //if (uint8_t rest = m_bit_idx % 8) {
-        if (uint8_t rest = m_bit_idx & 7) {
+        if (uint8_t rest = m_bit_idx & 7) { // test if the last byte has all bits used (no padding)
 
             //assert(rest && effective_byte_size() > 0);
 
@@ -324,7 +326,8 @@ BitArray & BitArray::operator+=(const BitArray &o) {
         return *this;
 
     // we are lucky 'cause we can block-copy
-    if (this->bit_length() % 8 == 0) {
+    //if (this->bit_length() % 8 == 0) {
+    if (!(m_bit_idx & 7)) {
 
         auto sz = effective_byte_size(); // ATTENTION!!! this value can be 0, usually memory size is never 0 i dont wanna change the entire logic
         auto o_sz = o.effective_byte_size();

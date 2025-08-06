@@ -10,6 +10,7 @@
 
 #include <Histogram.hpp>
 #include <math/math.hpp>
+#include <HuffmanCode.hpp>
 
 // this class only store "useless" stats that can be useful for debug etc, to compute huffman all you need is Histogram
 struct ShannonHistogram: public Histogram {
@@ -34,7 +35,7 @@ struct ShannonHistogram: public Histogram {
         using (symbol, huffman_code.length()) with the length of the original uncompressed input
         is possible gets back: probability, frequency, self_information of given symbol.
      */
-    explicit ShannonHistogram(const std::vector<BitArray> &symbol_table, uint64_t uncompressed_input_length)
+    explicit ShannonHistogram(const std::vector<HuffmanCode> &symbol_table, uint64_t uncompressed_input_length)
         : m_original_dataset_length{uncompressed_input_length} {
 
         assert(symbol_table.size() == 256);

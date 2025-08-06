@@ -5,6 +5,10 @@
 
 #include <common.hpp>
 
+static constexpr FORCED(inline) uint32_t pow2(uint8_t exp) {
+    return 2 << (exp - 1);
+}
+
 // ceil_div(x, 8) -> same of (int)ceil(x/8.)
 static constexpr FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) noexcept {
     return (num-1) / div + 1;

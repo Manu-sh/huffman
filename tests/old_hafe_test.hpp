@@ -4,8 +4,10 @@
 #include <hafe_file_format/Hafe.hpp>
 #include <common.hpp>
 #include <HuffmanTree.hpp>
+#include <HuffmanCode.hpp>
 #include <Histogram.hpp>
 #include <SymbolTable.hpp>
+
 #include <bitarray/BitArray.hpp>
 #include <encoder/Encoder.hpp>
 #include <decoder/Decoder.hpp>
@@ -26,7 +28,7 @@ using namespace std;
 TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
 
     { // single row test
-        SymbolTable fake_st{std::make_shared<vector<BitArray>>(256)};
+        SymbolTable fake_st{std::make_shared<vector<HuffmanCode>>(256)};
         auto &fake_symtable = fake_st.mut();
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) == 0);
 
@@ -83,7 +85,7 @@ TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
 
          */
 
-        SymbolTable fake_st{std::make_shared<vector<BitArray>>(256)};
+        SymbolTable fake_st{std::make_shared<vector<HuffmanCode>>(256)};
         auto &fake_symtable = fake_st.mut();
 
         fake_symtable['B'].push_back(1).push_back(1).push_back(0);
@@ -241,4 +243,5 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         //auto out = ofstream_open("../../data/mandelbrot.pnm.out");
         //out.write((char *)str.data(), str.length());
+
 }
