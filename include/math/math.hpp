@@ -15,7 +15,7 @@ static constexpr FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) noe
 }
 
 template <const bool use_pct = 1>
-static FORCED(inline) double compression_rateo(uint64_t compressed_len, uint64_t uncompressed_len) noexcept {
+static FORCED(inline) double compression_ratio(uint64_t compressed_len, uint64_t uncompressed_len) noexcept {
     static_assert(use_pct == 1, "not implemented");
     assert(compressed_len && uncompressed_len);
     return 100. * compressed_len / uncompressed_len;

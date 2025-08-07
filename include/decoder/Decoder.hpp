@@ -20,6 +20,8 @@ struct Decoder {
         BitArray token(1000 * 8 * 1);
 
         for (uint64_t i = 0, len = encoded.bit_length(); i < len; ++i) {
+
+            assert(token.bit_length() < 48); // TODO:
             token.push_back(encoded[i]);
 
             if (auto p = huffman_codes.find(token)) {
@@ -42,6 +44,8 @@ struct Decoder {
     inline const auto & bitstream()         const { return m_bitstream.borrow();    }
     inline const auto & symbol_table()      const { return m_symbol_table.borrow(); }
     inline const auto & str()               const { return *m_str;                  }
+    inline double compression_ratio_pct()   const { return ::compression_ratio(m_bitstream.borrow().bit_length(), m_str->length() * 8); }
+
     inline const auto & shannon_histogram() const {
         static const ShannonHistogram histogram{m_symbol_table.borrow(), m_str->length()};
         return histogram;

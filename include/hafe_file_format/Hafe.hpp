@@ -56,14 +56,14 @@ struct Hafe {
         }
 
 #ifdef DBG_HAFE_BIG_ENDIAN
-        inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_bsize = htobe32(symbol_table_size), *this; }
+        inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_disk_bsize = htobe32(symbol_table_size), *this; }
         inline Hafe & bitstream_bitsz(uint64_t bit_size) { return m_bitstream_bitsz = htobe64(bit_size), *this; }
-        inline uint32_t symbol_table_size() const noexcept { return be32toh(m_symbol_table_bsize); }
+        inline uint32_t symbol_table_size() const noexcept { return be32toh(m_symbol_table_disk_bsize); }
         inline   uint64_t bitstream_bitsz() const noexcept { return be64toh(m_bitstream_bitsz);    }
 #else
-        inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_bsize = htole32(symbol_table_size), *this; }
+        inline Hafe & symbol_table_size(uint32_t symbol_table_size) { return m_symbol_table_disk_bsize = htole32(symbol_table_size), *this; }
         inline Hafe & bitstream_bitsz(uint64_t bit_size) { return m_bitstream_bitsz = htole64(bit_size), *this; }
-        inline uint32_t symbol_table_size() const noexcept { return le32toh(m_symbol_table_bsize); }
+        inline uint32_t symbol_table_size() const noexcept { return le32toh(m_symbol_table_disk_bsize); }
         inline   uint64_t bitstream_bitsz() const noexcept { return le64toh(m_bitstream_bitsz);    }
 #endif
 
@@ -75,7 +75,7 @@ struct Hafe {
         // TOP:
         uint8_t m_magic[4] {};
         [[maybe_unused]] uint8_t m_reserved[16];
-        uint32_t m_symbol_table_bsize; // TODO: empty rows aren't stored on disk but they must be accessible later)
+        uint32_t m_symbol_table_disk_bsize; // TODO: empty rows aren't stored on disk but they must be accessible later, if you have 10 non-empty rows this values is 10 but you have to allocate 256
 
         // SymTable
         SymbolTable m_symbol_table;
@@ -98,7 +98,7 @@ void Hafe::read(std::istream &is) {
         throw std::runtime_error{"missing reserved bytes"};
 
     // read symbol_table length
-    if (!is.read((char *)&m_symbol_table_bsize, sizeof m_symbol_table_bsize))
+    if (!is.read((char *)&m_symbol_table_disk_bsize, sizeof m_symbol_table_disk_bsize))
         throw std::runtime_error{"missing symbol table length"};
 
     // read symbol table

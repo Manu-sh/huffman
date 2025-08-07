@@ -80,6 +80,7 @@ struct ShannonHistogram: public Histogram {
 
 
     // TODO: eventualmente usare una std::multimap e definire una relazione d'ordine in base alle frequenze oppure ordinare e basta
+    // TODO: setters
     void dump_entry(uint8_t symbol) const {
 
         using std::cout, std::endl;
