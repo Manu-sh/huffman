@@ -48,20 +48,39 @@ TEST_CASE("testing huffman on strings") {
     //try_decode(file_content("../../data/divina_commedia.txt"));
 }
 
-
 TEST_CASE("testing ") {
 
     {
-        Histogram fake_freq;
 
-        for (int i = 0; i < 128; ++i) {
-            //fake_freq.m_frequency[i] = std::numeric_limits<decltype(fake_freq.m_frequency[0])>::max() - 1;
-            //fake_freq.m_frequency[i] = std::numeric_limits<uint32_t>::max() - 1;
-            fake_freq.m_frequency[i] = (i + 1) * 1;
+        // fibonacci tends to produce the worst case scenario in huffman tree(s)
+        // https://stackoverflow.com/questions/19883086/optimal-huffman-code-for-fibonacci-numbers#19893487
+        // https://github.com/ahmedss33/Introduction-to-Algorithms-Solutions/blob/master/C16-Greedy-Algorithms/16.3.md
+        const static auto &fibonacci_gen = [] (auto callable, uint32_t from = 0, uint32_t to = 256) -> void {
+
+            uint32_t a = from, b = 1;
+            uint32_t cur_fibo = a + b;
+
+            for (uint32_t i = from; i < to; ++i, cur_fibo = a + b) {
+                callable(cur_fibo, i);
+                a = b;
+                b = cur_fibo;
+            }
+
+        };
+
+        Histogram fake_freq;
+        fibonacci_gen([&fake_freq] (uint32_t fibo, uint8_t idx) {
+            fake_freq.m_frequency[idx] = fibo;
+            }, 2, 256);
+
+        fake_freq.m_frequency[0] = fake_freq.m_frequency[1] = 1;
+
+        for (int i = 0; i < 256; ++i) {
+            cout << ((void *)(long)i) << " " << fake_freq.m_frequency[i] << endl;
         }
 
-        //fake_freq.m_frequency[0] = 1;
-        fake_freq.m_frequency[0] = std::numeric_limits<uint32_t>::max() - 1;
+
+        //fake_freq.m_frequency[0] = std::numeric_limits<uint32_t>::max() - 1;
         auto tree = HuffmanTree(fake_freq);
 
         SymbolTable st{tree};
@@ -80,7 +99,6 @@ TEST_CASE("testing ") {
         //freq.dump_entry(0xb6);
 
     }
-
 
 }
 
