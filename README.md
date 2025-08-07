@@ -29,10 +29,11 @@ All integers in **Little Endian**:
 
 #### Symbol Table On Disk
 The symbol table is stored as contiguos block of variable size every block, each block is a prefix table entry that describe a symbol and his prefix code
+empty entries are not allowed.
 
 | uint8_t | uint16_t                                                                           | uint8_t[]                     |
 ----------|------------------------------------------------------------------------------------|-------------------------------
-| symbol  | the length > 0 of prefix code **in bits** excluding padding, this value must be at least 1 | prefix code (at least 1 byte) |
+| symbol  | the length > 0 of prefix code **in bits** excluding padding, this value cannot be 0 | prefix code (at least 1 byte) |
 
 
 Example, suppose you have to store a 3 bit prefix code `101` entry for the symbol `'c'` you will write:
@@ -71,7 +72,7 @@ uint8_t[??] bitstream;
 - https://huffman-coding-online.vercel.app
 - https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1234/resources/huffman.html
 - https://www.math.unipd.it/~baldan/Alg2/Slide/Lezione2.pdf (italian)
-- https://www.youtube.com/playlist?list=PLU4IQLU9e_OpnkbCS_to64F_vw5yyg4HB
+- https://www.youtube.com/playlist?list=PLU4IQLU9e_OrY8oASHx0u3IXAL9TOdidm
 
 ##### Special Thanks
 
