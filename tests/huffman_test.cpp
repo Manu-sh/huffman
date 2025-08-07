@@ -85,6 +85,26 @@ TEST_CASE("testing ") {
             cout << ((void *)(long)i) << " " << fake_freq.m_frequency[i] << endl;
         }
 
+        // data una frequenza massima FREQ_MAX(Symbol) di std::numeric_limits<uint32_t>::max()
+        // strlen(pcode) più grande generato sarà dato da questa brutta formula:
+        // ceil( log(1.618, 4294967295 * sqrt(5))) )
+        // il logaritmo in base sezione aurea si può calcolare invertendo la base del logaritmo così
+        // Math::log10(x) / Math::log10(1.618) (oppure usando il logaritmo in base naturale)
+        //ceil( std::log(1.618, std::numeric_limits<uint32_t>::max() * sqrt(5)) )
+        auto number = std::ceil(
+                std::log10(std::numeric_limits<uint32_t>::max() * std::sqrt(5.0)) /
+                std::log10(1.618)
+        );
+
+        REQUIRE(number == 48);
+
+        auto x = std::ceil(
+                std::log10(std::numeric_limits<uint8_t>::max() * std::sqrt(5.0)) /
+                std::log10(1.618)
+        );
+
+        REQUIRE(x == 14);
+
         // TODO: the maximum length for huffman codes with the freq limited to u32 is 48 bit
         auto tree = HuffmanTree(fake_freq);
 

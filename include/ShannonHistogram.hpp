@@ -44,7 +44,7 @@ struct ShannonHistogram: public Histogram {
         for (uint16_t sym = 0; sym < 256; ++sym) {
             const auto &huffman_code = symbol_table[sym];
             if (huffman_code.empty()) continue;
-            m_map[sym].probability      = shannon_probability(huffman_code.bit_length());
+            m_map[sym].probability      = shannon_probability(huffman_code.bit_length()); // 2**-length
             m_map[sym].self_information = shannon_self_information(m_map[sym].probability);
             m_frequency[sym]            = m_map[sym].probability * m_original_dataset_length; // calc frequency
         }
