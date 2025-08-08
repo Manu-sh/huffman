@@ -5,6 +5,13 @@
 
 #include <common.hpp>
 
+
+// il logaritmo in base X di un argomento A si può calcolare
+// usando il logaritmo in base 10: log10(X) / log10(A)
+static double log_in_base(double base, double argument) {
+    return std::log10(argument) / std::log10(base);
+}
+
 static constexpr FORCED(inline) uint32_t pow2(uint8_t exp) {
     return 2 << (exp - 1);
 }

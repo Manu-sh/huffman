@@ -19,6 +19,7 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 #include "bitarray_test.hpp"
 #include "old_hafe_test.hpp"
 #include "encoder_decoder_test.hpp"
+#include <HuffmanCode.hpp>
 
 using namespace std;
 
@@ -48,6 +49,7 @@ TEST_CASE("testing huffman on strings") {
     //try_decode(file_content("../../data/divina_commedia.txt"));
 }
 
+#include <algorithm>
 TEST_CASE("testing ") {
 
     {
@@ -85,31 +87,24 @@ TEST_CASE("testing ") {
             cout << ((void *)(long)i) << " " << fake_freq.m_frequency[i] << endl;
         }
 
-        // data una frequenza massima FREQ_MAX(Symbol) di std::numeric_limits<uint32_t>::max()
-        // strlen(pcode) più grande generato sarà dato da questa brutta formula:
-        // ceil( log(1.618, 4294967295 * sqrt(5))) )
-        // il logaritmo in base sezione aurea si può calcolare invertendo la base del logaritmo così
-        // Math::log10(x) / Math::log10(1.618) (oppure usando il logaritmo in base naturale)
-        //ceil( std::log(1.618, std::numeric_limits<uint32_t>::max() * sqrt(5)) )
-        auto number = std::ceil(
-                std::log10(std::numeric_limits<uint32_t>::max() * std::sqrt(5.0)) /
-                std::log10(1.618)
-        );
-
-        REQUIRE(number == 48);
-
-        auto x = std::ceil(
-                std::log10(std::numeric_limits<uint8_t>::max() * std::sqrt(5.0)) /
-                std::log10(1.618)
-        );
-
-        REQUIRE(x == 14);
+        REQUIRE(huffman_code_max_length<uint32_t>() == 48);
+        REQUIRE(huffman_code_max_length<uint16_t>() == 25);
+        REQUIRE(huffman_code_max_length<uint8_t>()  == 14);
 
         // TODO: the maximum length for huffman codes with the freq limited to u32 is 48 bit
         auto tree = HuffmanTree(fake_freq);
 
         SymbolTable st{tree};
         st.print();
+
+        const auto &v = st.borrow();
+        auto f_max = std::max_element(v.begin(), v.end(), [] (const HuffmanCode &a, const HuffmanCode &b) -> bool {
+            return a.bit_length() < b.bit_length();
+        })->bit_length();
+
+        //cout << "here: " << f_max << endl;
+        REQUIRE(huffman_code_max_length<uint32_t>() == f_max);
+
     }
 
 
