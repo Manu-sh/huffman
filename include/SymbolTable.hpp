@@ -20,12 +20,18 @@
  */
 struct SymbolTable {
 
+    static constexpr uint16_t MAX_SYMBOLS = 256;
+
     protected:
         static std::shared_ptr<std::vector<HuffmanCode>> build_symbol_table(const HuffmanNode *root);
 
     public:
         SymbolTable() = default;
-        SymbolTable(std::shared_ptr<std::vector<HuffmanCode>> self): m_self{self} {}
+        SymbolTable(std::shared_ptr<std::vector<HuffmanCode>> self): m_self{self} {
+
+            // TODO: attualmente SymbolTable è solo un oggetto proxy sarebbe meglio istanziare direttamente la classe stessa già con 256 elementi visto che non ci sono casi diversi
+            assert(self && self->size() == SymbolTable::MAX_SYMBOLS);
+        }
         explicit SymbolTable(const HuffmanTree &tree): SymbolTable{ SymbolTable::build_symbol_table(tree.root()) } {}
 
         inline auto & mut() const { return *m_self; }
@@ -56,7 +62,7 @@ std::shared_ptr<std::vector<HuffmanCode>> SymbolTable::build_symbol_table(const 
     using HuffmanNode::CHILD_LEFT, HuffmanNode::CHILD_RIGHT, std::pair, std::vector; // C++20
 
     std::forward_list<pair<const HuffmanNode *, HuffmanCode>> open; // a stack
-    auto shp_symbol_table = std::make_shared<vector<HuffmanCode>>(256);
+    auto shp_symbol_table = std::make_shared<vector<HuffmanCode>>(SymbolTable::MAX_SYMBOLS);
     auto &huffman_code = *shp_symbol_table.get();
 
     if (root->is_leaf()) {

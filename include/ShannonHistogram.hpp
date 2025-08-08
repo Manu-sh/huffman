@@ -11,6 +11,8 @@
 #include <Histogram.hpp>
 #include <math/math.hpp>
 #include <HuffmanCode.hpp>
+#include <SymbolTable.hpp>
+
 
 // this class only store "useless" stats that can be useful for debug etc, to compute huffman all you need is Histogram
 struct ShannonHistogram: public Histogram {
@@ -38,10 +40,10 @@ struct ShannonHistogram: public Histogram {
     explicit ShannonHistogram(const std::vector<HuffmanCode> &symbol_table, uint64_t uncompressed_input_length)
         : m_original_dataset_length{uncompressed_input_length} {
 
-        assert(symbol_table.size() == 256);
+        assert(symbol_table.size() == SymbolTable::MAX_SYMBOLS);
 
         m_avg_bit_per_symbol = 0;
-        for (uint16_t sym = 0; sym < 256; ++sym) {
+        for (uint16_t sym = 0; sym < symbol_table.size(); ++sym) {
             const auto &huffman_code = symbol_table[sym];
             if (huffman_code.empty()) continue;
             m_map[sym].probability      = shannon_probability(huffman_code.bit_length()); // 2**-length

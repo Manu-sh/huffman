@@ -21,7 +21,7 @@ struct Decoder {
 
         for (uint64_t i = 0, len = encoded.bit_length(); i < len; ++i) {
 
-            assert(token.bit_length() < 48); // TODO:
+            assert(token.bit_length() < HuffmanCode::MAX_LENGTH);
             token.push_back(encoded[i]);
 
             if (auto p = huffman_codes.find(token)) {

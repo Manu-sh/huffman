@@ -1,11 +1,15 @@
 #pragma once
 
 #include <bitarray/BitArray.hpp>
-#include <math/math.hpp>
-#include <cmath>
-#include <type_traits>
 
-using HuffmanCode = BitArray;
+struct HuffmanCode: BitArray {
+
+    static constexpr uint8_t MAX_LENGTH = 255;
+
+    using BitArray::BitArray;
+
+};
+
 
 
 /*

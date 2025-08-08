@@ -58,7 +58,7 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
 
         const auto &freq  = encoder.shannon_histogram();
         auto symbol_table = encoder.symbol_table();
-        assert(symbol_table.longest().bit_length() < 256);
+        assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
         Hafe hafe = encoder.hafe();
         hafe.write(std::cout);

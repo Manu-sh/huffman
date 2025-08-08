@@ -28,13 +28,14 @@ using namespace std;
 TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
 
     { // single row test
-        SymbolTable fake_st{std::make_shared<vector<HuffmanCode>>(256)};
+        SymbolTable fake_st{std::make_shared<vector<HuffmanCode>>(SymbolTable::MAX_SYMBOLS)};
         auto &fake_symtable = fake_st.mut();
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) == 0);
+        REQUIRE(fake_symtable.size() == SymbolTable::MAX_SYMBOLS);
 
         srand(time(0));
 
-        uint8_t sym = rand() % 256;
+        uint8_t sym = rand() % fake_symtable.size();
         auto &row = fake_symtable[sym];
 
         row.push_back(1); // 1° bit
@@ -85,7 +86,7 @@ TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
 
          */
 
-        SymbolTable fake_st{std::make_shared<vector<HuffmanCode>>(256)};
+        SymbolTable fake_st{std::make_shared<vector<HuffmanCode>>(SymbolTable::MAX_SYMBOLS)};
         auto &fake_symtable = fake_st.mut();
 
         fake_symtable['B'].push_back(1).push_back(1).push_back(0);
@@ -122,7 +123,7 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         auto tree = HuffmanTree(freq);
         SymbolTable st{tree};
-        REQUIRE(st.longest().bit_length() < 256);
+        REQUIRE(st.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
         const auto &symbol_table = st.borrow();
         {
@@ -158,7 +159,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         Hafe hafe{where};
 
         auto st = hafe.symbol_table();
-        REQUIRE(st.longest().bit_length() < 256);
+        REQUIRE(st.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
         const auto &symbol_table = st.borrow();
 
@@ -189,7 +190,7 @@ TEST_CASE("testing .hafe compress & decompress") {
 
             auto tree = HuffmanTree(freq);
             SymbolTable st{tree};
-            REQUIRE(st.longest().bit_length() < 256);
+            REQUIRE(st.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
             const auto &symbol_table = st.borrow();
             REQUIRE(st.share() != nullptr);

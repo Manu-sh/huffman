@@ -13,7 +13,6 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <iostream>
 #include <string>
 #include <cstdint>
-#include <limits>
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 #include "bitarray_test.hpp"
@@ -32,7 +31,7 @@ TEST_CASE("testing huffman on strings") {
         auto tree = HuffmanTree(freq);
         SymbolTable st{tree};
 
-        REQUIRE(st.longest().bit_length() < 256);
+        REQUIRE(st.longest().bit_length() < HuffmanCode::MAX_LENGTH);
         const std::vector<HuffmanCode> &symbol_table = st.borrow();
 
         auto shp_encoded = Encoder::encode(st, str);
@@ -48,6 +47,8 @@ TEST_CASE("testing huffman on strings") {
     try_decode("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbccccccccccccddddddddddddddddddddddddeeeeeeeeefffff");
 
     //try_decode(file_content("../../data/divina_commedia.txt"));
+
+
 }
 
 

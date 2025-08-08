@@ -21,7 +21,7 @@ extern "C" {
 // Huffman Archive Format Example .hafe (all integers in little endian)
 struct Hafe {
 
-    static std::shared_ptr<std::vector<BitArray>> read_symbol_table(std::istream &is, uint32_t symbol_table_bsize);
+    static std::shared_ptr<std::vector<HuffmanCode>> read_symbol_table(std::istream &is, uint32_t symbol_table_bsize);
     static uint32_t calc_symbol_table_disk_size(const SymbolTable &st);
     static void write_symbol_table(std::ostream &os, const SymbolTable &st);
 
@@ -151,10 +151,10 @@ void Hafe::write(std::ostream &os) const {
 
 
 // | symbol  | bit_length(code) | prefix code |
-std::shared_ptr<std::vector<BitArray>> Hafe::read_symbol_table(std::istream &is, uint32_t symbol_table_bsize) {
+std::shared_ptr<std::vector<HuffmanCode>> Hafe::read_symbol_table(std::istream &is, uint32_t symbol_table_bsize) {
 
     // empty rows aren't stored on disk but they must be accessible later so we cannot use symbol_table_bsize as argument, it must be 256
-    auto shp_sym_table = std::make_shared<std::vector<BitArray>>(256);
+    auto shp_sym_table = std::make_shared<std::vector<HuffmanCode>>(SymbolTable::MAX_SYMBOLS);
     auto &symbol_table = *shp_sym_table.get();
 
     // TODO: non è detto che le eccezioni siano abilitate sullo stream che leggo
@@ -162,7 +162,7 @@ std::shared_ptr<std::vector<BitArray>> Hafe::read_symbol_table(std::istream &is,
     is.exceptions(ios_base::badbit | ios_base::failbit | ios_base::eofbit);
 
     // return 0 on failure otherwise the bytes read
-    static const auto &read_next_entry = [](std::vector <BitArray> &map, std::istream &is) -> std::streamsize {
+    static const auto &read_next_entry = [](std::vector <HuffmanCode> &map, std::istream &is) -> std::streamsize {
 
         std::streamsize b_read = 0;
 
@@ -198,7 +198,7 @@ std::shared_ptr<std::vector<BitArray>> Hafe::read_symbol_table(std::istream &is,
         if (!is.read((char *)bit_stream.data(), byte_length)) // load the prefix code (including padding bits)
             return 0;
 
-        map[sym] = BitArray{std::move(bit_stream), bit_length}; // swap the internal buffer (and cut at bit_length bits)
+        map[sym] = HuffmanCode{std::move(bit_stream), bit_length}; // swap the internal buffer (and cut at bit_length bits)
         return b_read += is.gcount();
     };
 
@@ -215,7 +215,7 @@ uint32_t Hafe::calc_symbol_table_disk_size(const SymbolTable &st) {
     const auto &symbol_table = st.borrow();
 
     uint32_t bsize = 0;
-    for (unsigned sym = 0; sym < 256; ++sym) {
+    for (unsigned sym = 0; sym < SymbolTable::MAX_SYMBOLS; ++sym) {
         const auto &huffman_code = symbol_table[sym];
         if (huffman_code.empty()) continue;
 
@@ -261,7 +261,7 @@ void Hafe::write_symbol_table(std::ostream &os, const SymbolTable &st) {
         return bool{os};
     };
 
-    for (unsigned sym = 0; sym < 256; ++sym) {
+    for (unsigned sym = 0; sym < SymbolTable::MAX_SYMBOLS; ++sym) {
         const auto &huffman_code = symbol_table[sym];
         if (huffman_code.empty()) continue;
         if (!write_entry(os, sym, huffman_code))

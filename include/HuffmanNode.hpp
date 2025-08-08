@@ -26,7 +26,7 @@ struct HuffmanNode final {
     // NOTE: huffman ha problemi di overflow, dal momento che ogni nodo superiore costituisce la somma di altri 2 se 2 foglie fossero con frequenza altissima es. 2**32
     //     i loro genitori su nella gerarchia possono mandare in overflow un uint64
 
-    inline explicit HuffmanNode(HuffmanNode *left, HuffmanNode* right) noexcept: m_child{left,right} { // construct an huffman node as subtree having n1 and n2 has child
+    inline explicit HuffmanNode(HuffmanNode *left, HuffmanNode* right): m_child{left,right} { // construct an huffman node as subtree having n1 and n2 has child
         assert(left && right);
 
         uint64_t fl = left->freq();

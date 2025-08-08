@@ -10,14 +10,15 @@
 
 struct InverseSymbolTable final { // faster than unordered_map
 
-    const uint8_t * find(const HuffmanCode &huffman_code) const noexcept {
+    // if bit_sequence correspond to a valid huffman code the original symbol is returned
+    const uint8_t * find(const BitArray &bit_sequence) const noexcept {
 
-        const uint16_t idx = prefix_code_hash(huffman_code) & (BUCKET_SIZE-1);
+        const uint16_t idx = prefix_code_hash(bit_sequence) & (BUCKET_SIZE-1);
         const Bucket &bucket = m_buckets[idx];
 
         for (uint32_t i = 0, len = bucket.size(); i < len; ++i) {
             const auto &pair = bucket[i];
-            if (huffman_code == pair.first)
+            if (bit_sequence == pair.first)
                 return &pair.second;
         }
 
@@ -28,7 +29,7 @@ struct InverseSymbolTable final { // faster than unordered_map
 
         friend class SymbolTable;
         using Bucket = std::vector<std::pair<HuffmanCode, uint8_t>>;
-        // TODO: questi sono 40 byte a botta, sicuramente i prefix-code sono lunghi al massimo 256
+        // TODO: questi sono 40 byte a botta, sicuramente i prefix-code sono lunghi al massimo 256-1
         //  creare una classe/alias prefix-code rendere BitArray Template sulla lunghezza?
 
         // the maximum length of prefix codes, is 255.
@@ -49,7 +50,7 @@ struct InverseSymbolTable final { // faster than unordered_map
             x % log2(prefix.bit_length), despite the many hashes we've tried, this one performs best.
         */
 
-        static FORCED(inline) uint64_t prefix_code_hash(const HuffmanCode &prefix_code) {
+        static FORCED(inline) uint64_t prefix_code_hash(const BitArray &prefix_code) {
             return uint8_t(prefix_code.back_byte()) ^ prefix_code.bit_length();
         }
 
