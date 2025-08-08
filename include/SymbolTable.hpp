@@ -10,6 +10,7 @@
 #include <forward_list>
 #include <cstdio>
 #include <cctype>
+#include <algorithm>
 
 /*
 // TODO: disequazione di kraft mc millan
@@ -32,6 +33,8 @@ struct SymbolTable {
         inline auto share() const { return m_self; }
 
         void print() const;
+        const HuffmanCode & longest() const;
+
         // const BitArray & operator[](sym) const {}
 
         InverseSymbolTable inverse_symbol_table() const {
@@ -99,4 +102,16 @@ void SymbolTable::print() const {
         printf(std::isprint(i) ? "'%c'  | %s\n" : "%#02x | %s\n", i, bit_str.c_str()); // this is so bad.. but it's just 4 dbg :)
     }
 
+}
+
+
+// return the longest huffman code or an empty one
+const HuffmanCode & SymbolTable::longest() const {
+
+    const auto &symbol_table = *m_self;
+    auto it = std::max_element(symbol_table.begin(), symbol_table.end(), [] (const HuffmanCode &a, const HuffmanCode &b) -> bool {
+        return a.bit_length() < b.bit_length();
+    });
+
+    return it == symbol_table.end() ? *symbol_table.begin() : *it;
 }

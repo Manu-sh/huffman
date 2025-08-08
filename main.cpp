@@ -58,6 +58,7 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
 
         const auto &freq  = encoder.shannon_histogram();
         auto symbol_table = encoder.symbol_table();
+        assert(symbol_table.longest().bit_length() < 256);
 
         Hafe hafe = encoder.hafe();
         hafe.write(std::cout);
@@ -82,6 +83,7 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
         Decoder decoder{hafe};
 
         const auto &symbol_table = decoder.symbol_table();
+        assert(symbol_table.longest().bit_length() < 256);
         //print_symbol_table(symbol_table);
 
         auto bitstream = decoder.bitstream();

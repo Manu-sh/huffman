@@ -41,8 +41,8 @@ struct Decoder {
 
     explicit Decoder(const Hafe &to_decode): Decoder{to_decode.symbol_table(), to_decode.bitstream()} {}
 
-    inline const auto & bitstream()         const { return m_bitstream.borrow();    }
-    inline const auto & symbol_table()      const { return m_symbol_table.borrow(); }
+    inline const auto & bitstream()         const { return m_bitstream;    }
+    inline const auto & symbol_table()      const { return m_symbol_table; }
     inline const auto & str()               const { return *m_str;                  }
     inline double compression_ratio_pct()   const { return ::compression_ratio(m_bitstream.borrow().bit_length(), m_str->length() * 8); }
 

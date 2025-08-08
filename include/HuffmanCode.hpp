@@ -11,7 +11,6 @@ using HuffmanCode = BitArray;
 /*
 
 L'albero può degenerare a lista ma la profondità massima dell'albero di huffman è legata al numero dei simboli, quindi 256.
-
 Questo perché per ogni nodo Z creato in fase di costruzione dell'albero ci sono sempre almeno 2 figli,
 anche se uno di questi figli può essere un altro nodo fittizio aggiunto per creare il sottoalbero.
 Vedi diagramma.
@@ -45,13 +44,11 @@ ne consegue su un alfabeto di 256 simboli la lunghezza massima dei simboli è N-
 
 ---
 
-Ad ogni modo questo scenario non si verifica mai perché al crescere del numero dei simboli c'è un secondo limite
-quello del massimo numero che possono assumere le frequenze.
+Ad ogni modo questo scenario non si verifica facilmente (overflow a parte) perché al crescere del numero dei simboli c'è un secondo limite
+quello del massimo numero che possono assumere le frequenze. in caso di overflow delle frequenze però può effettivamente degenerare a lista.
 
 Siccome il worst-case è dato da nodi con frequenze che seguono l'andamento della sequenza di fibonacci e siccome questa sequenza è
 esponenziale anche un numero molto grosso per le frequenze viene raggiunto dopo pochi step della sequenza fibonacci
-
-Es. uint32_t fa si che la lunghezza massima dei prefix free code generato sia 48 o giù di lì e non 255.
 
  [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946,
  17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465,
@@ -61,9 +58,9 @@ Es. uint32_t fa si che la lunghezza massima dei prefix free code generato sia 48
  uint32_t take only 48 step to be overflowed by 4807526976
  uint64_t take only 94 step to be overflowed by 19740274219868223167
 
- so to produce the worst case scenario for an uint32_t you have to put only 48 symbols, this lead
- the maximum height of the tree (which will be 48-1) which is directly connected to the number of
- edges which is directly connected to the maximum length for an huffman code with f:uint32_t sym:uint8_t
+but it's not all there, because huffman take min(Q) + min(Q) and sum together into Z.
+Produce the worst case scenario for sym:uint8_t and freq:uint32_t is complex, so let's
+just assume the maximum length it's sizeof(uint8_t)-1.
 
  https://planetmath.org/listoffibonaccinumbers
  https://cstheory.stackexchange.com/questions/4935/why-does-the-fibonacci-sequence-produce-a-worst-case-huffman-encoding
@@ -75,18 +72,5 @@ Es. uint32_t fa si che la lunghezza massima dei prefix free code generato sia 48
  The Fibonacci sequence (as frequencies list) is defined to satisfy F(n) + F(n+1) = F(n+2).
  As a consequence, the resulting tree will be the most unbalanced one, being a full binary tree."
 
-data una frequenza massima FREQ_MAX(Symbol) di std::numeric_limits<uint32_t>::max()
-strlen(pcode) più grande generato sarà dato da questa brutta formula:
-floor( log(1.618, (2**32-1) * sqrt(5))) )
-
 */
 
-template <typename TFrequency>
-uint8_t huffman_code_max_length() {
-
-    static_assert(std::is_same_v<TFrequency, uint8_t> || std::is_same_v<TFrequency, uint16_t> || std::is_same_v<TFrequency, uint32_t> || std::is_same_v<TFrequency, uint64_t>,
-            "TFrequency must be an uint*_t type");
-
-    static constexpr double GOLDEN_RATIO = 1.618;
-    return std::floor<uint8_t>(log_in_base(GOLDEN_RATIO, (std::numeric_limits<TFrequency>::max()-1) * std::sqrt(5.0))) + 1; // +1 because it's a length
-}

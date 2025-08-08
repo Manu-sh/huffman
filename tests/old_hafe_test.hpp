@@ -118,11 +118,11 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         // compress
         std::string str = file_content(file_uncompressed);
-        //Histogram freq{(uint8_t *)str.data(), str.length()};
         ShannonHistogram freq{(uint8_t *)str.data(), str.length()};
 
         auto tree = HuffmanTree(freq);
         SymbolTable st{tree};
+        REQUIRE(st.longest().bit_length() < 256);
 
         const auto &symbol_table = st.borrow();
         {
@@ -158,6 +158,8 @@ TEST_CASE("testing .hafe compress & decompress") {
         Hafe hafe{where};
 
         auto st = hafe.symbol_table();
+        REQUIRE(st.longest().bit_length() < 256);
+
         const auto &symbol_table = st.borrow();
 
         REQUIRE(st.share() != nullptr);
@@ -187,6 +189,7 @@ TEST_CASE("testing .hafe compress & decompress") {
 
             auto tree = HuffmanTree(freq);
             SymbolTable st{tree};
+            REQUIRE(st.longest().bit_length() < 256);
 
             const auto &symbol_table = st.borrow();
             REQUIRE(st.share() != nullptr);

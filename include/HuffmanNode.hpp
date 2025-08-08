@@ -28,11 +28,36 @@ struct HuffmanNode final {
 
     inline explicit HuffmanNode(HuffmanNode *left, HuffmanNode* right) noexcept: m_child{left,right} { // construct an huffman node as subtree having n1 and n2 has child
         assert(left && right);
-        freq_sum = left->freq() + right->freq(); // F = n1.freq + n2.freq
+
+        uint64_t fl = left->freq();
+        uint64_t fr = right->freq();
+
+        if (fl >= std::numeric_limits<uint32_t>::max() || fr >= std::numeric_limits<uint32_t>::max())
+            throw std::runtime_error{"overflow detected"};
+
+        if (fl+fr >= std::numeric_limits<uint32_t>::max())
+            throw std::runtime_error{"overflow detected"};
+
+        freq_sum = fl + fr; // F = n1.freq + n2.freq
+        //freq_sum = left->freq() + right->freq(); // F = n1.freq + n2.freq
     }
 
     inline bool  is_leaf() const noexcept { return m_child[CHILD_LEFT] == m_child[CHILD_RIGHT]; } // nullptr == nullptr
     inline uint64_t freq() const noexcept { return is_leaf() ? leaf_data.freq : freq_sum; }
+
+    void print_subtree(const HuffmanNode *node, int cur_depth = 0) const {
+
+        if (node == nullptr) return;
+
+        std::string tabs(cur_depth++, ' ');
+        std::cout << tabs << "=> " << node->freq() << '\n';
+
+        for (const auto child : {node->m_child[CHILD_LEFT], node->m_child[CHILD_RIGHT]})
+            print_subtree(child, cur_depth);
+
+    }
+
+
 
     std::string name() const {
 

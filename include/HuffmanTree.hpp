@@ -16,11 +16,17 @@ struct HuffmanTree {
     //explicit HuffmanTree(const Histogram &freq, uint8_t max_bits); // depth-limited huffman tree (for bit-limited prefix-free-codes)
 
     inline const HuffmanNode * root() const { return m_root; }
+    void print() const { // 4 debugging
+        m_root->print_subtree(m_root);
+    }
 
     protected:
         std::vector<std::shared_ptr<HuffmanNode>> gc; // garbage collection
         HuffmanNode *m_root;
 };
+
+
+
 
 HuffmanTree::HuffmanTree(const Histogram &histogram) {
 

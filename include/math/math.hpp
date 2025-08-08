@@ -75,3 +75,34 @@ Es.
 
         this value represents the MINIMUM number of bits needed to encode the event (according to Shannon)
 */
+
+
+#if 0
+// fibonacci tends to produce the worst case scenario in huffman tree(s)
+// https://stackoverflow.com/questions/19883086/optimal-huffman-code-for-fibonacci-numbers#19893487
+// https://github.com/ahmedss33/Introduction-to-Algorithms-Solutions/blob/master/C16-Greedy-Algorithms/16.3.md
+
+// skipping the zero return every other element of fibonacci until max_times is reached or fibo(n) > max_fibo
+template <typename T>
+static std::vector<T> fibonacci_gen(uint32_t from, uint32_t to, uint64_t max_fibo = std::numeric_limits<T>::max()) {
+
+    if (max_fibo == std::numeric_limits<uint64_t>::max())
+        --max_fibo;
+
+    std::vector<T> numbers{1, 1};
+
+    uint64_t a = 1, b = 1;
+    uint64_t cur_fibo = a + b;
+
+    for (uint32_t i = from; i < to; ++i, cur_fibo = a + b) {
+        if (cur_fibo >= max_fibo)
+            return numbers;
+
+        numbers.push_back(cur_fibo);
+        a = b;
+        b = cur_fibo;
+    }
+
+    return numbers;
+}
+#endif
