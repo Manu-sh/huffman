@@ -49,6 +49,32 @@ TEST_CASE("testing huffman on strings") {
     //try_decode(file_content("../../data/divina_commedia.txt"));
 }
 
+
+// skipping the zero return every other element of fibonacci until max_times is reached or fibo(n) > max_fibo
+template <typename T>
+static std::vector<T> fibonacci_gen(uint32_t from, uint32_t to, uint64_t max_fibo = std::numeric_limits<T>::max()) {
+
+    if (max_fibo == std::numeric_limits<uint64_t>::max())
+        --max_fibo;
+
+    std::vector<T> numbers{1, 1};
+
+    uint64_t a = 1, b = 1;
+    uint64_t cur_fibo = a + b;
+
+    for (uint32_t i = from; i < to; ++i, cur_fibo = a + b) {
+        if (cur_fibo >= max_fibo)
+            return numbers;
+
+        numbers.push_back(cur_fibo);
+        a = b;
+        b = cur_fibo;
+    }
+
+    return numbers;
+}
+
+
 #include <algorithm>
 TEST_CASE("testing ") {
 
@@ -57,31 +83,38 @@ TEST_CASE("testing ") {
         // fibonacci tends to produce the worst case scenario in huffman tree(s)
         // https://stackoverflow.com/questions/19883086/optimal-huffman-code-for-fibonacci-numbers#19893487
         // https://github.com/ahmedss33/Introduction-to-Algorithms-Solutions/blob/master/C16-Greedy-Algorithms/16.3.md
-        const static auto &fibonacci_gen = [] (auto callable, uint32_t fibo_start, uint32_t from = 0, uint32_t to = 256,
-                uint64_t max_fibo = std::numeric_limits<uint64_t>::max() - 1) -> void {
 
-            uint32_t a = from, b = 1;
-            uint32_t cur_fibo = a + b;
 
-            for (uint32_t i = from; i < to; ++i, cur_fibo = a + b) {
-                if (cur_fibo >= max_fibo) return;
-                callable(cur_fibo, i);
-                a = b;
-                b = cur_fibo;
-            }
 
-        };
-
+        /*
+        TODO: praticamente l'oveflow ha fatto impazzire huffman che non si comporta più come dovrebbe e crea una lista vera e propria,
+         il limite dell'uint32_t ha senso solo se anche l'algoritmo lo rispetta.
+        */
         Histogram fake_freq;
+        //memset(fake_freq.m_frequency, 1, sizeof(fake_freq.m_frequency));
+
 
         for (int i = 0; i < 256; ++i) {
-            fake_freq.m_frequency[i] = 1; // memset 1
+            fake_freq.m_frequency[i] = std::numeric_limits<uint32_t>::max(); // memset 1
             cout << ((void *)(long)i) << " " << fake_freq.m_frequency[i] << endl;
         }
 
+
+        auto vc = fibonacci_gen<uint32_t>(2, 256);
+        for (const auto e : vc) {
+            static int i = 2;
+            cout << "i " << i << " e: " << e << endl;
+            fake_freq.m_frequency[i] = e;
+            REQUIRE(i++ < 256);
+        }
+
+
+        /*
+
         fibonacci_gen([&fake_freq] (uint32_t fibo, uint8_t idx) {
             fake_freq.m_frequency[idx] = fibo;
-            }, 0, 2, 256, std::numeric_limits<uint32_t>::max());
+        }, 2, 256, std::numeric_limits<uint32_t>::max());
+        */
 
         for (int i = 0; i < 256; ++i) {
             cout << ((void *)(long)i) << " " << fake_freq.m_frequency[i] << endl;
@@ -90,6 +123,8 @@ TEST_CASE("testing ") {
         REQUIRE(huffman_code_max_length<uint32_t>() == 48);
         REQUIRE(huffman_code_max_length<uint16_t>() == 25);
         REQUIRE(huffman_code_max_length<uint8_t>()  == 14);
+
+//exit(0);
 
         // TODO: the maximum length for huffman codes with the freq limited to u32 is 48 bit
         auto tree = HuffmanTree(fake_freq);
