@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <ios>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 // i could use template specialization and sfinae to force inlining
 // for some of these global function, but it's unnecessarily

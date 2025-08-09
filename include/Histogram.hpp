@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <cmath>
 #include <cstddef>
 #include <stdexcept>
 #include <limits>

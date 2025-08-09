@@ -18,9 +18,12 @@ extern "C" {
 #include <SymbolTable.hpp>
 #include <BitStream.hpp>
 
+//#define DBG_HAFE_BIG_ENDIAN
 
-#define DBG_HAFE_BIG_ENDIAN
-#undef DBG_HAFE_BIG_ENDIAN // comment this for endianess tests
+#ifdef DBG_HAFE_BIG_ENDIAN
+    #warning "BIG ENDIAN mode enabled, this mode is just for debugging purpose"
+#endif
+
 
 
 // Huffman Archive Format Example .hafe (all integers in little endian)

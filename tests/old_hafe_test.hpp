@@ -236,18 +236,36 @@ TEST_CASE("testing .hafe compress & decompress") {
     })
         full_test(s);
 
-        for (const auto &s : {
-            "il mio angolo di cielo e un triangolo di pelo",
-            "aaaaabbbbbbbbbccccccccccccdddddddddddddeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffffff",
-            "\x1dmiao miao miao miaooo",
-            "BPPRRRRRRBPGRGPR",
-            "abccdddeeeeeffffffffggggggggggggghhhhhhhhhhhhhhhhhhhhh",
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbccccccccccccddddddddddddddddddddddddeeeeeeeeefffff"
-        })
-            compress_decompress_string_full(s);
 
 
-        //auto out = ofstream_open("../../data/mandelbrot.pnm.out");
-        //out.write((char *)str.data(), str.length());
+    /*
+        per la stringa "BPPRRRRRRBPGRGPR"
+
+        'B'  | 110
+        'G'  | 111
+        'P'  | 10
+        'R'  | 0
+
+
+        'a'  | 1111110
+        'b'  | 1111111
+        'c'  | 111110
+        'd'  | 11110
+        'e'  | 1110
+        'f'  | 110
+        'g'  | 10
+        'h'  | 0
+    */
+
+
+    for (const auto &s : {
+        "il mio angolo di cielo e un triangolo di pelo",
+        "aaaaabbbbbbbbbccccccccccccdddddddddddddeeeeeeeeeeeeeeeefffffffffffffffffffffffffffffffffffffffffffff",
+        "\x1dmiao miao miao miaooo",
+        "BPPRRRRRRBPGRGPR",
+        "abccdddeeeeeffffffffggggggggggggghhhhhhhhhhhhhhhhhhhhh",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbccccccccccccddddddddddddddddddddddddeeeeeeeeefffff"
+    })
+        compress_decompress_string_full(s);
 
 }

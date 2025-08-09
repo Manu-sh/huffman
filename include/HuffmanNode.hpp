@@ -4,9 +4,6 @@
 #include <cassert>
 #include <sstream>
 #include <memory>
-#include <vector>
-
-#include <HuffmanNode.hpp>
 
 struct HuffmanNode final {
 

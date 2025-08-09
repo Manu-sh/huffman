@@ -1,6 +1,5 @@
 #pragma once
 #include <memory>
-#include <vector>
 #include <bitarray/BitArray.hpp>
 
 struct BitStream {
