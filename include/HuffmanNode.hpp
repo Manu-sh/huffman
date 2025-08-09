@@ -18,6 +18,19 @@ struct HuffmanNode final {
         CHILD_LEN
     };
 
+
+    static void recursive_dfs(auto callback, const HuffmanNode *node, uint32_t cur_depth = 0) {
+
+        if (node == nullptr) return;
+
+        callback(node, cur_depth++);
+
+        for (const auto child : {node->m_child[CHILD_LEFT], node->m_child[CHILD_RIGHT]})
+            recursive_dfs(callback, child, cur_depth);
+    }
+
+
+
     inline explicit HuffmanNode(uint8_t symbol, uint32_t frequency) noexcept: m_child{} { // construct an huffman node as leaf
         leaf_data.symbol = symbol;
         leaf_data.freq   = frequency;
@@ -44,19 +57,6 @@ struct HuffmanNode final {
 
     inline bool  is_leaf() const noexcept { return m_child[CHILD_LEFT] == m_child[CHILD_RIGHT]; } // nullptr == nullptr
     inline uint64_t freq() const noexcept { return is_leaf() ? leaf_data.freq : freq_sum; }
-
-    void print_subtree(const HuffmanNode *node, int cur_depth = 0) const {
-
-        if (node == nullptr) return;
-
-        std::string tabs(cur_depth++, ' ');
-        std::cout << tabs << "=> " << node->freq() << '\n';
-
-        for (const auto child : {node->m_child[CHILD_LEFT], node->m_child[CHILD_RIGHT]})
-            print_subtree(child, cur_depth);
-
-    }
-
 
 
     std::string name() const {

@@ -16,13 +16,34 @@ struct HuffmanTree {
     //explicit HuffmanTree(const Histogram &freq, uint8_t max_bits); // depth-limited huffman tree (for bit-limited prefix-free-codes)
 
     inline const HuffmanNode * root() const { return m_root; }
+    inline auto height() { // this value is used in testing this is why i use recursion (for now)
+
+        if (m_height > 0) return m_height;
+
+        // lazy on initialization
+        HuffmanNode::recursive_dfs([this] ([[maybe_unused]] const HuffmanNode *node, uint32_t cur_depth) {
+            if (cur_depth > this->m_height)
+                this->m_height = cur_depth;
+        }, m_root);
+
+        return m_height;
+    }
+
     void print() const { // 4 debugging
-        m_root->print_subtree(m_root);
+
+        static const auto cb = [] (const HuffmanNode *node, uint32_t cur_depth) {
+            std::cout << cur_depth << std::endl;
+            std::string tabs(cur_depth++, ' ');
+            std::cout << tabs << "=> " << node->freq() << '\n';
+        };
+
+        HuffmanNode::recursive_dfs(cb, m_root);
     }
 
     protected:
         std::vector<std::shared_ptr<HuffmanNode>> gc; // garbage collection
         HuffmanNode *m_root;
+        uint32_t m_height = 0;
 };
 
 
@@ -67,4 +88,5 @@ HuffmanTree::HuffmanTree(const Histogram &histogram) {
     }
 
     this->m_root = pq.top();
+
 }

@@ -124,6 +124,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         auto tree = HuffmanTree(freq);
         SymbolTable st{tree};
         REQUIRE(st.longest().bit_length() < HuffmanCode::MAX_LENGTH);
+        REQUIRE(st.longest().bit_length() == tree.height());
 
         const auto &symbol_table = st.borrow();
         {
@@ -191,6 +192,7 @@ TEST_CASE("testing .hafe compress & decompress") {
             auto tree = HuffmanTree(freq);
             SymbolTable st{tree};
             REQUIRE(st.longest().bit_length() < HuffmanCode::MAX_LENGTH);
+            REQUIRE(st.longest().bit_length() == tree.height());
 
             const auto &symbol_table = st.borrow();
             REQUIRE(st.share() != nullptr);

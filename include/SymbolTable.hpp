@@ -29,10 +29,11 @@ struct SymbolTable {
         SymbolTable() = default;
         SymbolTable(std::shared_ptr<std::vector<HuffmanCode>> self): m_self{self} {
 
-            // TODO: attualmente SymbolTable è solo un oggetto proxy sarebbe meglio istanziare direttamente la classe stessa già con 256 elementi visto che non ci sono casi diversi
-            assert(self && self->size() == SymbolTable::MAX_SYMBOLS);
+            if (!self || self->size() != SymbolTable::MAX_SYMBOLS)
+                throw std::runtime_error{"Invalid symbol table attached"};
         }
-        explicit SymbolTable(const HuffmanTree &tree): SymbolTable{ SymbolTable::build_symbol_table(tree.root()) } {}
+
+       explicit SymbolTable(const HuffmanTree &tree): SymbolTable{ SymbolTable::build_symbol_table(tree.root()) } {}
 
         inline auto & mut() const { return *m_self; }
         inline const auto & borrow() const { return *m_self; }

@@ -32,6 +32,9 @@ TEST_CASE("testing huffman on strings") {
         SymbolTable st{tree};
 
         REQUIRE(st.longest().bit_length() < HuffmanCode::MAX_LENGTH);
+
+        //tree.print();
+        REQUIRE(st.longest().bit_length() == tree.height());
         const std::vector<HuffmanCode> &symbol_table = st.borrow();
 
         auto shp_encoded = Encoder::encode(st, str);
