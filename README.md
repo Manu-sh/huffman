@@ -31,7 +31,7 @@ All integers in **Little Endian**:
 The symbol table is stored as contiguos block of variable size every block, each block is a prefix table entry that describe a symbol and his prefix code
 empty entries are not allowed.
 
-| uint8_t | uint16_t                                                                           | uint8_t[]                     |
+| uint8_t | uint8_t                                                                           | uint8_t[]                     |
 ----------|------------------------------------------------------------------------------------|-------------------------------
 | symbol  | the length > 0 of prefix code **in bits** excluding padding, this value cannot be 0 | prefix code (at least 1 byte) |
 
@@ -39,7 +39,7 @@ empty entries are not allowed.
 Example, suppose you have to store a 3 bit prefix code `101` entry for the symbol `'c'` you will write:
 
 - 1 byte (the symbol `'c'`)
-- 2 byte the number of bits that compose the prefix code (3) in little endian
+- 1 byte the number of bits that compose the prefix code (3)
 - 1 byte (the prefix code) `101`+ 5 bit of garbage
 
 To read this prefix code the decompressor will read `(bits / 8.0).ceil()` bytes and will consider only the first 3 bits.
@@ -49,7 +49,7 @@ You may also find helping the following C-Like pseudo-code:
 ```c
 struct {
   uint8_t symbol;
-  uint16_t prefix_len_in_bits = 1; // at least 1 bit, no empty entries allowed
+  uint8_t prefix_len_in_bits = 1; // at least 1 bit, no empty entries allowed
   uint8_t[??] prefix_code;         // unknow but at least 1 element
 };
 

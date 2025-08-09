@@ -41,11 +41,11 @@ TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
         row.push_back(1); // 1° bit
 
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) ==
-            sizeof(uint8_t) + sizeof(uint16_t) + row.effective_byte_size()
+            sizeof(uint8_t) + sizeof(uint8_t) + row.effective_byte_size()
         );
 
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) ==
-            1+2+1
+            1+1+1
         );
 
         // 7 bit
@@ -53,20 +53,20 @@ TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
         row.push_back(1).push_back(1).push_back(1).push_back(1);
 
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) ==
-            sizeof(uint8_t) + sizeof(uint16_t) + row.effective_byte_size()
+            sizeof(uint8_t) + sizeof(uint8_t) + row.effective_byte_size()
         );
 
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) ==
-            1+2+1 // 4
+            1+1+1 // 4
         );
 
         row.push_back(1); // 9° bit, now is larger the row require 2 byte
 
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) ==
-            sizeof(uint8_t) + sizeof(uint16_t) + row.effective_byte_size()
+            sizeof(uint8_t) + sizeof(uint8_t) + row.effective_byte_size()
         );
 
-        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) == 5);
+        REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) == 4);
     }
 
     {
@@ -80,7 +80,7 @@ TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
 
             format will be stored on disk as follow:
 
-                | uint8_t | uint16_t         | uint8_t[]   |
+                | uint8_t | uint8_t          | uint8_t[]   |
                 ----------|------------------|-------------
                 | symbol  | bit_length(code) | prefix code |
 
@@ -101,7 +101,7 @@ TEST_CASE("testing Hafe::calc_symbol_table_disk_size()") {
         REQUIRE(fake_symtable['R'].effective_byte_size() == sizeof(uint8_t));
 
         REQUIRE(Hafe::calc_symbol_table_disk_size(fake_st) ==
-            (sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint8_t)) * strlen("BGPR") // size of Rows x Column
+            (sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint8_t)) * strlen("BGPR") // size of Rows x Column
         );
 
     }

@@ -18,6 +18,11 @@ extern "C" {
 #include <SymbolTable.hpp>
 #include <BitStream.hpp>
 
+
+#define DBG_HAFE_BIG_ENDIAN
+#undef DBG_HAFE_BIG_ENDIAN // comment this for endianess tests
+
+
 // Huffman Archive Format Example .hafe (all integers in little endian)
 struct Hafe {
 
@@ -167,26 +172,20 @@ std::shared_ptr<std::vector<HuffmanCode>> Hafe::read_symbol_table(std::istream &
         std::streamsize b_read = 0;
 
         uint8_t sym;         // symbol
-        uint16_t bit_length; // bitstream length in bits without padding
+        uint8_t bit_length; // bitstream length in bits without padding
 
         if (!is.read((char *)&sym, sizeof(uint8_t))) // get() doesn't update gcount()
             return 0;
 
         b_read += is.gcount();
 
-        if (!is.read((char *)&bit_length, sizeof(uint16_t)))
+        if (!is.read((char *)&bit_length, sizeof(uint8_t)))
             return 0;
 
         b_read += is.gcount();
 
         // we need this to know at which byte stop reading the bit-stream
-        uint16_t byte_length = BitArray::bytes_required(
-#ifdef DBG_HAFE_BIG_ENDIAN
-                bit_length = be16toh(bit_length)
-#else
-                bit_length = le16toh(bit_length)
-#endif
-        );
+        uint16_t byte_length = BitArray::bytes_required(bit_length);
 
         if (byte_length == 0)
             throw std::runtime_error{"refuse to create a symbol table entry with size 0"};
@@ -194,7 +193,7 @@ std::shared_ptr<std::vector<HuffmanCode>> Hafe::read_symbol_table(std::istream &
         //std::cout << "sym:" << sym << ":bysz:" << byte_length << std::endl;
 
         // the same value CANNOT be obtained by: BitArray{reserve_bit_length}.effective_byte_size()
-        std::vector <BitArray8> bit_stream(byte_length);
+        std::vector<BitArray8> bit_stream(byte_length);
         if (!is.read((char *)bit_stream.data(), byte_length)) // load the prefix code (including padding bits)
             return 0;
 
@@ -220,7 +219,7 @@ uint32_t Hafe::calc_symbol_table_disk_size(const SymbolTable &st) {
         if (huffman_code.empty()) continue;
 
         bsize += sizeof(uint8_t);  // symbol
-        bsize += sizeof(uint16_t); // length
+        bsize += sizeof(uint8_t); // length
         bsize += huffman_code.effective_byte_size(); // bitstream size in bytes
     }
 
@@ -238,7 +237,7 @@ void Hafe::write_symbol_table(std::ostream &os, const SymbolTable &st) {
 
     // write the symbol table size
 #ifdef DBG_HAFE_BIG_ENDIAN
-    uint32_t symbol_table_bsize = htobe32(Hafe::calc_symbol_table_disk_size(symbol_table));
+    uint32_t symbol_table_bsize = htobe32(Hafe::calc_symbol_table_disk_size(st));
 #else
     uint32_t symbol_table_bsize = htole32(Hafe::calc_symbol_table_disk_size(st));
 #endif
@@ -248,14 +247,10 @@ void Hafe::write_symbol_table(std::ostream &os, const SymbolTable &st) {
 
     static const auto &write_entry = [] (std::ostream &os, uint8_t sym, const BitArray &huffman_code) -> bool {
 
-#ifdef DBG_HAFE_BIG_ENDIAN
-        uint16_t length = htobe16((uint16_t)huffman_code.bit_length());
-#else
-        uint16_t length = htole16((uint16_t)huffman_code.bit_length());
-#endif
+        uint8_t length = huffman_code.bit_length();
 
         os.put(sym); // symbol
-        os.write((char *)&length, sizeof(uint16_t)); // length
+        os.write((char *)&length, sizeof(uint8_t)); // length
         os.write((char *)huffman_code.bitstream(), huffman_code.effective_byte_size()); // prefix code
 
         return bool{os};
