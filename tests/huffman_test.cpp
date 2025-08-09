@@ -15,6 +15,7 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <cstdint>
 DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
+#include "huffman_code_test.hpp"
 #include "bitarray_test.hpp"
 #include "old_hafe_test.hpp"
 #include "encoder_decoder_test.hpp"

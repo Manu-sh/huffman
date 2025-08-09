@@ -4,17 +4,20 @@
 #include <utility>
 #include <memory>
 #include <cstdlib>
+#include <algorithm>
 
 #include <HuffmanCode.hpp>
 #include <math/math.hpp>
 
 struct InverseSymbolTable final { // faster than unordered_map
 
+    // TODO: try binary search
     // if bit_sequence correspond to a valid huffman code the original symbol is returned
     const uint8_t * find(const BitArray &bit_sequence) const noexcept {
 
         const uint16_t idx = prefix_code_hash(bit_sequence) & (BUCKET_SIZE-1);
         const Bucket &bucket = m_buckets[idx];
+
 
         for (uint32_t i = 0, len = bucket.size(); i < len; ++i) {
             const auto &pair = bucket[i];
@@ -22,6 +25,7 @@ struct InverseSymbolTable final { // faster than unordered_map
                 return &pair.second;
         }
 
+        //auto x = std::binary_search(bucket.begin(), bucket.end());
         return nullptr;
     }
 
@@ -62,6 +66,14 @@ struct InverseSymbolTable final { // faster than unordered_map
                 this->insert_unique(symbol_table[i], i);
             }
 
+            // sort every bucket
+            /*
+            for (uint64_t i = 0; i < BUCKET_SIZE; ++i)
+                std::sort(m_buckets[i].begin(), m_buckets[i].end(), [] (const std::pair<HuffmanCode, uint8_t> &kva, const std::pair<HuffmanCode, uint8_t> &kvb) -> bool {
+                    const auto a = kva.first, b = kvb.first;
+                    return a.bit_length() < b.bit_length() || a.str() < b.str();
+                });
+           */
         }
 
         void insert_unique(const HuffmanCode &huffman_code, uint8_t symbol) {

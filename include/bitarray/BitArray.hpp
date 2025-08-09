@@ -47,6 +47,20 @@ struct BitArray {
     }
 
 
+    template<typename TIntegral>
+    static BitArray from(TIntegral bits) {
+
+        static_assert(std::is_integral<TIntegral>::value, "TUnsigned must be an uint*_t type");
+
+        const uint8_t bytes = sizeof(TIntegral);
+        BitArray ret{ (bytes+1) * 8};
+
+        memcpy(ret.m_vct.data(), &bits, bytes);
+        ret.m_bit_idx = (bytes+1) * 8;
+        return ret;
+    }
+
+
     struct BitArrayIterator; // forward declaration
 
     using value_type      = bool;
@@ -125,7 +139,43 @@ struct BitArray {
 
     BitArray & operator+=(const BitArray &o);
 
+#if 1
+    // TODO: this function is to compare prefix codes, not bit arrays move this function as operator<(HuffmanCode,BitArray)
+    //  because of the length assumption, if the length if different 2 different prefix code are different for sure
+    FORCED(inline) int operator<=>(const BitArray &o) const {
 
+
+        if (m_bit_idx != o.m_bit_idx) // same of:  if (bit_length() != o.bit_length())
+            return m_bit_idx - o.bit_length();
+
+        //assert(m_bit_idx);
+        bool skip_last_byte = 0;
+        int cmp = 0;
+
+        //if (uint8_t rest = m_bit_idx % 8) {
+        if (uint8_t rest = m_bit_idx & 7) { // test if the last byte has all bits used (no padding)
+
+            skip_last_byte = 1;
+
+            //assert(rest && effective_byte_size() > 0);
+
+            // cut away the padding bits
+            const uint8_t last_byte_this  = back_byte().take_few(rest);
+            const uint8_t last_byte_other = o.back_byte().take_few(rest);
+
+            cmp = last_byte_this - last_byte_other;
+
+            if (effective_byte_size() == 1) // è grande esattamente 1 byte, evita di passare a memcmp() perchè con size 0 giustamente scazza
+                return last_byte_this - last_byte_other;
+        }
+
+        int chunk_order = memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte);
+        return skip_last_byte ? (chunk_order+cmp) : chunk_order;
+    }
+
+
+    // TODO: this function is to compare prefix codes, not bit arrays move this function as operator==(HuffmanCode,BitArray)
+    //  because of the length assumption, if the length if different 2 different prefix code are different for sure
     FORCED(inline) bool operator==(const BitArray &o) const {
 
         // static int count = 0;
@@ -158,6 +208,7 @@ struct BitArray {
         //if (count % 10 == 0) std::cout << count << std::endl;
         return memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte) == 0;
     }
+#endif
 
     FORCED(inline) uint64_t bit_length()   const noexcept { return m_bit_idx;         } // bits you have pushed with push function
     FORCED(inline) uint64_t bit_capacity() const noexcept { return m_bit_capacity;    } // in this container bit_capacity()-1 is always accessible, this value is at least 1

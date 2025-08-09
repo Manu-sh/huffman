@@ -19,7 +19,7 @@ struct __attribute__((__packed__)) BitArray8 {
         }
 
     public:
-        //explicit BitArray8(uint8_t byte): data{byte} {}
+        // explicit BitArray8(uint8_t byte): data{byte} {}
 
         FORCED(inline) bool operator[](uint8_t i) const {
             assert(i < 8);

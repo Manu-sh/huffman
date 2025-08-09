@@ -1,5 +1,6 @@
 #pragma once
-
+#include <cstring>
+#include <type_traits>
 #include <bitarray/BitArray.hpp>
 
 struct HuffmanCode: BitArray {
@@ -8,6 +9,84 @@ struct HuffmanCode: BitArray {
 
     using BitArray::BitArray;
 
+/*
+    // TODO: this function is to compare prefix codes, not bit arrays move this function as operator<(HuffmanCode,BitArray)
+    //  because of the length assumption, if the length if different 2 different prefix code are different for sure
+    FORCED(inline) int operator<=>(const HuffmanCode &o) const {
+
+        if (m_bit_idx != o.m_bit_idx) // same of:  if (bit_length() != o.bit_length())
+            return m_bit_idx - o.bit_length();
+
+        //assert(m_bit_idx);
+        bool skip_last_byte = 0;
+        int cmp = 0;
+
+        //if (uint8_t rest = m_bit_idx % 8) {
+        if (uint8_t rest = m_bit_idx & 7) { // test if the last byte has all bits used (no padding)
+
+            skip_last_byte = 1;
+
+            //assert(rest && effective_byte_size() > 0);
+
+            // cut away the padding bits
+            const uint8_t last_byte_this  = back_byte().take_few(rest);
+            const uint8_t last_byte_other = o.back_byte().take_few(rest);
+
+            cmp = last_byte_this - last_byte_other;
+
+            if (effective_byte_size() == 1) // è grande esattamente 1 byte, evita di passare a memcmp() perchè con size 0 giustamente scazza
+                return last_byte_this - last_byte_other;
+        }
+
+        int chunk_order = memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte);
+        return skip_last_byte ? (chunk_order+cmp) : chunk_order;
+    }
+
+
+    // TODO: this function is to compare prefix codes, not bit arrays move this function as operator==(HuffmanCode,BitArray)
+    //  because of the length assumption, if the length if different 2 different prefix code are different for sure
+    FORCED(inline) bool operator==(const HuffmanCode &o) const {
+
+        // static int count = 0;
+
+        if (m_bit_idx != o.m_bit_idx) // same of:  if (bit_length() != o.bit_length())
+            return false;
+
+        //assert(m_bit_idx);
+        bool skip_last_byte = 0;
+
+        //if (uint8_t rest = m_bit_idx % 8) {
+        if (uint8_t rest = m_bit_idx & 7) { // test if the last byte has all bits used (no padding)
+
+            //assert(rest && effective_byte_size() > 0);
+
+            // cut away the padding bits
+            const uint8_t last_byte_this  = back_byte().take_few(rest);
+            const uint8_t last_byte_other = o.back_byte().take_few(rest);
+
+            if (last_byte_this != last_byte_other)
+                return false;
+
+            if (effective_byte_size() == 1) // è grande esattamente 1 byte, evita di passare a memcmp() perchè con size 0 giustamente scazza
+                return true;
+
+            skip_last_byte = 1;
+        }
+
+        // if (effective_byte_size() > 8) ++count;
+        //if (count % 10 == 0) std::cout << count << std::endl;
+        return memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte) == 0;
+    }
+
+
+    FORCED(inline) int operator<=>(const BitArray &o) const {
+        return *this <=> ((const HuffmanCode &)o);
+    }
+
+    FORCED(inline) bool operator==(const BitArray &o) const {
+        return *this == ((const HuffmanCode &)o);
+    }
+*/
 };
 
 
