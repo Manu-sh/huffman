@@ -125,6 +125,7 @@ struct BitArray {
 
     BitArray & operator+=(const BitArray &o);
 
+
     FORCED(inline) bool operator==(const BitArray &o) const {
 
         // static int count = 0;
@@ -141,8 +142,6 @@ struct BitArray {
             //assert(rest && effective_byte_size() > 0);
 
             // cut away the padding bits
-            //const uint8_t last_byte_this  = (((uint8_t)back_byte())   >> (8 - rest));
-            //const uint8_t last_byte_other = (((uint8_t)o.back_byte()) >> (8 - rest));
             const uint8_t last_byte_this  = back_byte().take_few(rest);
             const uint8_t last_byte_other = o.back_byte().take_few(rest);
 
@@ -252,6 +251,19 @@ struct BitArray {
     FORCED(inline) BitArray8 & back_byte() {
         return m_vct[last_element_byte_idx()];
     }
+
+    FORCED(inline) bool has_padding_bits() const {
+        return m_bit_idx & 7;
+    }
+
+    FORCED(inline) uint8_t padding_bits() const {
+        return has_padding_bits() ? 8 - (m_bit_idx & 7) : 0;
+    }
+
+    FORCED(inline) uint8_t back_byte_without_padding() const {
+        return has_padding_bits() ? back_byte().take_few(m_bit_idx & 7) : (uint8_t)back_byte(); // x&7 -> bit_length()%8
+    }
+
 
     protected:
             std::vector<BitArray8> m_vct; // used as memory block

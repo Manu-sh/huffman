@@ -24,6 +24,7 @@ TEST_CASE("testing empty bitarray") {
 
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 0);
+        REQUIRE(a.padding_bits() == 0);
 
         a.clear();
 
@@ -32,6 +33,7 @@ TEST_CASE("testing empty bitarray") {
         REQUIRE(a.bit_length() == 0);
         REQUIRE(a.bit_capacity() == 8);
         REQUIRE(a.effective_byte_size() == 0);
+        REQUIRE(a.padding_bits() == 0);
     }
 
 }
@@ -47,6 +49,7 @@ TEST_CASE("testing bitarray{length}") {
 
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 0);
+        REQUIRE(a.padding_bits() == 0);
     }
 
     {
@@ -58,6 +61,7 @@ TEST_CASE("testing bitarray{length}") {
 
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 0);
+        REQUIRE(a.padding_bits() == 0);
     }
 
     {
@@ -69,6 +73,7 @@ TEST_CASE("testing bitarray{length}") {
 
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 0);
+        REQUIRE(a.padding_bits() == 0);
     }
 
     {
@@ -80,6 +85,7 @@ TEST_CASE("testing bitarray{length}") {
 
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 0);
+        REQUIRE(a.padding_bits() == 0);
     }
 
 }
@@ -100,6 +106,7 @@ TEST_CASE("testing bitarray::push_back()") {
             REQUIRE(a.bit_capacity() == 8);
             REQUIRE(a.last_element_byte_idx() == 0);
             REQUIRE(a.effective_byte_size() == 1);
+            REQUIRE(a.padding_bits() == 8-i);
         }
 
         // realloc test, inserting the 8th bit
@@ -111,6 +118,8 @@ TEST_CASE("testing bitarray::push_back()") {
 
         REQUIRE(a.bit_capacity() == 16);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 0);
+
 
         // 9 bit
         a.push_back(1);
@@ -121,6 +130,7 @@ TEST_CASE("testing bitarray::push_back()") {
         REQUIRE(a.last_element_byte_idx() == 1);
         REQUIRE(a.bit_capacity() == 16);
         REQUIRE(a.effective_byte_size() == 2);
+        REQUIRE(a.padding_bits() == 7);
 
         REQUIRE(a[8] == 1);
     }
@@ -141,6 +151,7 @@ TEST_CASE("testing bitarray::pop_back()") {
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.bit_capacity() == 8);
         REQUIRE(a.effective_byte_size() == 0);
+        REQUIRE(a.padding_bits() == 0);
 
         a.push_back(1); // PUSH 1
         REQUIRE(a[0] == 1);
@@ -149,6 +160,7 @@ TEST_CASE("testing bitarray::pop_back()") {
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.bit_capacity() == 8);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 7);
 
         a.clear();
 
@@ -172,6 +184,7 @@ TEST_CASE("testing bitarray::pop_back()") {
         REQUIRE(a.last_element_byte_idx() == 1);
         REQUIRE(a.bit_capacity() == 16);
         REQUIRE(a.effective_byte_size() == 2);
+        REQUIRE(a.padding_bits() == 7);
 
         // start remove every bit inserted
         a.pop_back(); // remove 9th bit
@@ -179,43 +192,49 @@ TEST_CASE("testing bitarray::pop_back()") {
         REQUIRE(a.bit_length() == 8);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 0);
 
         a.pop_back();
         REQUIRE(a.last_bit_idx() == 6);
         REQUIRE(a.bit_length() == 7);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 1);
 
         a.pop_back();
         REQUIRE(a.last_bit_idx() == 5);
         REQUIRE(a.bit_length() == 6);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 2);
 
         a.pop_back();
         REQUIRE(a.last_bit_idx() == 4);
         REQUIRE(a.bit_length() == 5);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
-
+        REQUIRE(a.padding_bits() == 3);
 
         a.pop_back();
         REQUIRE(a.last_bit_idx() == 3);
         REQUIRE(a.bit_length() == 4);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 4);
 
         a.pop_back();
         REQUIRE(a.last_bit_idx() == 2);
         REQUIRE(a.bit_length() == 3);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 5);
 
         a.pop_back();
         REQUIRE(a.last_bit_idx() == 1);
         REQUIRE(a.bit_length() == 2);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 6);
 
         a.pop_back();
         REQUIRE(!a.empty());
@@ -223,6 +242,7 @@ TEST_CASE("testing bitarray::pop_back()") {
         REQUIRE(a.bit_length() == 1);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 1);
+        REQUIRE(a.padding_bits() == 7);
 
         a.pop_back(); // remove the last bit
         REQUIRE(a.empty());
@@ -230,7 +250,7 @@ TEST_CASE("testing bitarray::pop_back()") {
         REQUIRE(a.bit_length() == 0);
         REQUIRE(a.last_element_byte_idx() == 0);
         REQUIRE(a.effective_byte_size() == 0);
-
+        REQUIRE(a.padding_bits() == 0);
     }
 
     {
