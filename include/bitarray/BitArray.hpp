@@ -59,6 +59,10 @@ struct BitArray {
         BitArray ret{ (bytes+1) * 8};
 
         memcpy(ret.m_vct.data(), &bits, bytes);
+
+        // TODO: iterator reverse()
+        //for (auto ret = std::end(ret); )
+
         ret.m_bit_idx = (bytes+1) * 8;
         return ret;
     }
@@ -290,8 +294,8 @@ struct BitArray::BitArrayIterator {
     using reference         = typename OuterClass::reference;
 
     BitArrayIterator() = default;
-    inline explicit BitArrayIterator(const OuterClass *instance, uint32_t index = 0)
-            : m_instance{instance}, m_index{index} {}
+    inline explicit BitArrayIterator(const OuterClass *instance, uint32_t bit_index = 0)
+            : m_instance{instance}, m_index{bit_index} {}
 
 
     value_type operator*() const {
