@@ -18,15 +18,22 @@ struct InverseSymbolTable final { // faster than unordered_map
         const uint16_t idx = prefix_code_hash(bit_sequence) & (BUCKET_SIZE-1);
         const Bucket &bucket = m_buckets[idx];
 
+#if 0
+        // binary search (perform worse)
+        auto it = std::lower_bound(bucket.cbegin(), bucket.cend(), bit_sequence, [] (const std::pair<HuffmanCode, uint8_t> &pair, const BitArray &bit_sequence) -> bool {
+                return pair.first < bit_sequence;
+        });
 
+        return it == bucket.end() || bit_sequence > it->first ? nullptr : &it->second;
+#else
         for (uint32_t i = 0, len = bucket.size(); i < len; ++i) {
             const auto &pair = bucket[i];
             if (bit_sequence == pair.first)
                 return &pair.second;
         }
 
-        //auto x = std::binary_search(bucket.begin(), bucket.end());
         return nullptr;
+#endif
     }
 
     private:
@@ -66,14 +73,14 @@ struct InverseSymbolTable final { // faster than unordered_map
                 this->insert_unique(symbol_table[i], i);
             }
 
+#if 0
             // sort every bucket
-            /*
             for (uint64_t i = 0; i < BUCKET_SIZE; ++i)
                 std::sort(m_buckets[i].begin(), m_buckets[i].end(), [] (const std::pair<HuffmanCode, uint8_t> &kva, const std::pair<HuffmanCode, uint8_t> &kvb) -> bool {
-                    const auto a = kva.first, b = kvb.first;
-                    return a.bit_length() < b.bit_length() || a.str() < b.str();
+                    return kva.first < kvb.first;
                 });
-           */
+#endif
+
         }
 
         void insert_unique(const HuffmanCode &huffman_code, uint8_t symbol) {

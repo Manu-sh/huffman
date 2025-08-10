@@ -14,13 +14,38 @@ struct HuffmanCode: BitArray {
         *((BitArray *)this) = std::move(b); // update if the memory layout differs
     }
 
+    friend FORCED(inline) int64_t operator<=>(const HuffmanCode &a, const HuffmanCode &b) {
+        return a <=> ((const BitArray &)b);
+    }
+
+    friend FORCED(inline) int64_t operator<=>(const BitArray &a, const HuffmanCode &b) {
+        return b <=> a;
+    }
 
     friend FORCED(inline) int64_t operator<=>(const HuffmanCode &a, const BitArray &b) {
 
         if (a.bit_length() != b.bit_length())
-            return a.bit_length() - b.bit_length(); // TODO: possible overflow
+            return a.bit_length() > b.bit_length() ? 1 : -1;
 
-        //assert(m_bit_idx);
+#if 0
+        size_t full_bytes = a.effective_byte_size();
+        if (a.has_padding_bits())
+            full_bytes--;
+
+        if (int cmp = memcmp(a.bitstream(), b.bitstream(), full_bytes))
+            return cmp;
+
+        // Se c'è un ultimo byte parziale
+        if (a.has_padding_bits()) {
+            uint8_t last_a = a.back_byte_without_padding();
+            uint8_t last_b = b.back_byte_without_padding();
+            if (last_a < last_b) return -1;
+            if (last_a > last_b) return 1;
+        }
+
+        return 0;
+
+#else
         bool skip_last_byte = 0;
         int cmp = 0;
 
@@ -35,6 +60,7 @@ struct HuffmanCode: BitArray {
 
         int chunk_order = memcmp(a.bitstream(), b.bitstream(), a.effective_byte_size() - skip_last_byte);
         return skip_last_byte ? (chunk_order+cmp) : chunk_order;
+#endif
     }
 
 

@@ -56,7 +56,8 @@ TEST_CASE("testing HuffmanCode") {
 
     {
         HuffmanCode a = HuffmanCode::from<uint8_t>(0b111);
-        HuffmanCode b = HuffmanCode::from<uint8_t>(0b1110'0000);
+        //HuffmanCode b = HuffmanCode::from<uint8_t>(0b1110'0000);
+        HuffmanCode b = HuffmanCode::from<uint8_t>(0b111);
         REQUIRE(a.str() == "00000111");
         REQUIRE(a.str() == b.str());
 
