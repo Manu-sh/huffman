@@ -57,30 +57,13 @@ TEST_CASE("testing HuffmanCode") {
     {
         HuffmanCode a = HuffmanCode::from<uint8_t>(0b111);
         HuffmanCode b = HuffmanCode::from<uint8_t>(0b1110'0000);
+        REQUIRE(a.str() == "00000111");
+        REQUIRE(a.str() == b.str());
 
-        //std::search(a.crbegin(), a.crend(), 0)
-
-        /*
-        auto it = std::crbegin(a);
-        for (; it != std::crend(a); ++it) {
-            std::cout << "->" << *it << std::endl;
-
-            if (*it == 0) continue;
-            //break;
-        }
-
-        auto where = std::distance(it, a.crend());
-        cout << where << endl;
-        */
-        cout << a.str() << endl;
-
-exit(0);
+        // TODO:
+        // REQUIRE(HuffmanCode::from("00000111").str() == "00000111");
 
 
-        REQUIRE(a.bit_capacity() == 8);
-        REQUIRE(b.bit_capacity() == 8);
-        //REQUIRE(a == b);
-        REQUIRE(a.back_byte_without_padding() == 0);
     }
 
 

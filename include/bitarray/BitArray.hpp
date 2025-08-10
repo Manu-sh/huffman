@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cassert>
 #include <cstring>
+#include <type_traits>
 
 #include "BitArray8.hpp"
 #include "math/math.hpp"
@@ -48,9 +49,13 @@ struct BitArray {
     }
 
 
-    template<typename TIntegral>
-    static BitArray from(TIntegral bits);
+    template <typename TUnsigned>
+    static BitArray from(TUnsigned bits) requires std::is_unsigned_v<TUnsigned>;
 
+#if 0
+    template <>
+    static BitArray from(std::string_view bits);
+#endif
 
     struct BitArrayIterator; // forward declaration
 
@@ -375,10 +380,10 @@ static_assert(std::bidirectional_iterator<BitArray::BitArrayIterator>);
 
 
 // TODO: endianess template & cast to unsigned type internally, eventually use if constexpr and std::is_same
-template<typename TUnsigned>
-BitArray BitArray::from(TUnsigned bits) {
+template <typename TUnsigned>
+BitArray BitArray::from(TUnsigned bits) requires std::is_unsigned_v<TUnsigned> {
 
-    static_assert(std::is_unsigned_v<TUnsigned>, "TUnsigned must be an unsigned type");
+    //static_assert(, "TUnsigned must be an unsigned type");
 
     const uint8_t bytes = sizeof(TUnsigned);
     BitArray ret{bytes * 8};
@@ -398,3 +403,15 @@ BitArray BitArray::from(TUnsigned bits) {
     ret.m_bit_idx = bytes * 8;
     return ret;
 }
+
+#if 0
+template<>
+BitArray BitArray::from(std::string_view bits) {
+
+    BitArray ret;
+    for (uint8_t ch : bits)
+        ret.push_back(ch - '0');
+
+    return ret;
+}
+#endif
