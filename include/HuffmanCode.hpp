@@ -22,6 +22,7 @@ struct HuffmanCode: BitArray {
         return b <=> a;
     }
 
+    // TODO: attualmente non è usata, rimuovere o sistemare
     friend FORCED(inline) int64_t operator<=>(const HuffmanCode &a, const BitArray &b) {
 
         if (a.bit_length() != b.bit_length())

@@ -11,7 +11,6 @@
 
 struct InverseSymbolTable final { // faster than unordered_map
 
-    // TODO: try binary search
     // if bit_sequence correspond to a valid huffman code the original symbol is returned
     const uint8_t * find(const BitArray &bit_sequence) const noexcept {
 
@@ -26,7 +25,7 @@ struct InverseSymbolTable final { // faster than unordered_map
 
         return it == bucket.end() || bit_sequence > it->first ? nullptr : &it->second;
 #else
-        for (uint32_t i = 0, len = bucket.size(); i < len; ++i) {
+        for (uint_fast32_t i = 0, len = bucket.size(); i < len; ++i) {
             const auto &pair = bucket[i];
             if (bit_sequence == pair.first)
                 return &pair.second;
