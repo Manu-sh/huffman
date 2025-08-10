@@ -563,6 +563,16 @@ TEST_CASE("testing BitArray::from()") {
         REQUIRE(a == b);
     }
 
+
+    {
+        BitArray a = BitArray::from<uint8_t>(0b111);
+        BitArray b = BitArray::from<uint8_t>(0b111);
+        REQUIRE(a.bit_capacity() == 16);
+        REQUIRE(b.bit_capacity() == 16);
+        REQUIRE(a == b);
+    }
+
+
     {
         BitArray a = BitArray::from(uint8_t(0b111));
         BitArray b = BitArray::from(uint8_t(0b111));

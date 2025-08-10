@@ -35,6 +35,9 @@ target_compile_options(${PROJECT_NAME}
         #-ftrapv
         -z,stack-size=786433
         -fstack-protector-all -fstack-protector-strong
+        -fno-builtin-memcpy
+        #-fno-tree-builtin-call-dce
+
         #-fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable
         #-g3 -fno-omit-frame-pointer
         -O0

@@ -17,6 +17,7 @@
 
 #define FORCED(_UNUSED_) inline __attribute__((always_inline))
 
+
 static std::ifstream ifstream_open(const char *filename, std::ios_base::iostate flags = std::ios_base::badbit) {
     using std::literals::string_literals::operator""s, std::ios_base;
     std::ifstream file;

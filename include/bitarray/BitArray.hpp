@@ -12,6 +12,7 @@
 #include "math/math.hpp"
 #include "common.hpp"
 
+
 // TODO: reserve() and resize() method?
 
 // NOTA: avere effective_byte_size() sempre ad almeno 1 semplificherebbe molto l'arimentica
@@ -47,10 +48,12 @@ struct BitArray {
     }
 
 
+    // TODO: endianess template & cast to unsigned type internally, eventually use if constexpr and std::is_same
     template<typename TIntegral>
     static BitArray from(TIntegral bits) {
 
-        static_assert(std::is_integral<TIntegral>::value, "TUnsigned must be an uint*_t type");
+        static_assert(std::is_integral<TIntegral>::value, "TIntegral must be an integral type type");
+
 
         const uint8_t bytes = sizeof(TIntegral);
         BitArray ret{ (bytes+1) * 8};
@@ -80,6 +83,8 @@ struct BitArray {
 
     explicit BitArray(BitArray8 *vct, uint64_t byte_length, uint64_t bit_length) {
 
+        assert(vct != m_vct.data()); // avoid overlap
+
         // required_bytes can be < byte_length the user can provide a bigger chunk and ask to read only few bits
         // but the user can also ask to read 23 bits which require 3 bytes ceil(bits / 8)
         uint64_t required_bytes = bytes_required(bit_length);
@@ -91,6 +96,7 @@ struct BitArray {
 
         m_vct.resize(required_bytes);
         memcpy(m_vct.data(), vct, required_bytes);
+        //unsafe_memcpy(m_vct.data(), vct, required_bytes);
 
         m_bit_capacity = required_bytes << 3; // required_bytes * 8
         m_bit_idx = bit_length;
@@ -130,7 +136,6 @@ struct BitArray {
         assert(&(o.m_vct) != &(this->m_vct));;
 
         m_vct.resize(o.m_vct.size());
-        //memcpy(m_vct.data(), o.m_vct.data(), o.m_vct.size());
         memcpy(m_vct.data(), o.m_vct.data(), o.effective_byte_size());
         m_bit_capacity = o.m_bit_capacity;
         m_bit_idx = o.m_bit_idx;
@@ -139,63 +144,16 @@ struct BitArray {
 
     BitArray & operator+=(const BitArray &o);
 
-#if 1
-    // TODO: this function is to compare prefix codes, not bit arrays move this function as operator<(HuffmanCode,BitArray)
-    //  because of the length assumption, if the length if different 2 different prefix code are different for sure
-    FORCED(inline) int operator<=>(const BitArray &o) const {
 
-
-        if (m_bit_idx != o.m_bit_idx) // same of:  if (bit_length() != o.bit_length())
-            return m_bit_idx - o.bit_length();
-
-        //assert(m_bit_idx);
-        bool skip_last_byte = 0;
-        int cmp = 0;
-
-        //if (uint8_t rest = m_bit_idx % 8) {
-        if (uint8_t rest = m_bit_idx & 7) { // test if the last byte has all bits used (no padding)
-
-            skip_last_byte = 1;
-
-            //assert(rest && effective_byte_size() > 0);
-
-            // cut away the padding bits
-            const uint8_t last_byte_this  = back_byte().take_few(rest);
-            const uint8_t last_byte_other = o.back_byte().take_few(rest);
-
-            cmp = last_byte_this - last_byte_other;
-
-            if (effective_byte_size() == 1) // è grande esattamente 1 byte, evita di passare a memcmp() perchè con size 0 giustamente scazza
-                return last_byte_this - last_byte_other;
-        }
-
-        int chunk_order = memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte);
-        return skip_last_byte ? (chunk_order+cmp) : chunk_order;
-    }
-
-
-    // TODO: this function is to compare prefix codes, not bit arrays move this function as operator==(HuffmanCode,BitArray)
-    //  because of the length assumption, if the length if different 2 different prefix code are different for sure
     FORCED(inline) bool operator==(const BitArray &o) const {
-
-        // static int count = 0;
 
         if (m_bit_idx != o.m_bit_idx) // same of:  if (bit_length() != o.bit_length())
             return false;
 
-        //assert(m_bit_idx);
         bool skip_last_byte = 0;
+        if (has_padding_bits() || o.has_padding_bits()) { // test if the last byte has all bits used (no padding) m_bit_idx % 8
 
-        //if (uint8_t rest = m_bit_idx % 8) {
-        if (uint8_t rest = m_bit_idx & 7) { // test if the last byte has all bits used (no padding)
-
-            //assert(rest && effective_byte_size() > 0);
-
-            // cut away the padding bits
-            const uint8_t last_byte_this  = back_byte().take_few(rest);
-            const uint8_t last_byte_other = o.back_byte().take_few(rest);
-
-            if (last_byte_this != last_byte_other)
+            if (back_byte_without_padding() != o.back_byte_without_padding())
                 return false;
 
             if (effective_byte_size() == 1) // è grande esattamente 1 byte, evita di passare a memcmp() perchè con size 0 giustamente scazza
@@ -204,11 +162,9 @@ struct BitArray {
             skip_last_byte = 1;
         }
 
-        // if (effective_byte_size() > 8) ++count;
-        //if (count % 10 == 0) std::cout << count << std::endl;
         return memcmp(bitstream(), o.bitstream(), effective_byte_size() - skip_last_byte) == 0;
     }
-#endif
+
 
     FORCED(inline) uint64_t bit_length()   const noexcept { return m_bit_idx;         } // bits you have pushed with push function
     FORCED(inline) uint64_t bit_capacity() const noexcept { return m_bit_capacity;    } // in this container bit_capacity()-1 is always accessible, this value is at least 1
@@ -311,10 +267,10 @@ struct BitArray {
         return has_padding_bits() ? 8 - (m_bit_idx & 7) : 0;
     }
 
+    // cut away the padding bits from the last byte & return the last byte
     FORCED(inline) uint8_t back_byte_without_padding() const {
         return has_padding_bits() ? back_byte().take_few(m_bit_idx & 7) : (uint8_t)back_byte(); // x&7 -> bit_length()%8
     }
-
 
     protected:
             std::vector<BitArray8> m_vct; // used as memory block
@@ -400,6 +356,7 @@ BitArray & BitArray::operator+=(const BitArray &o) {
 
         void *dst = m_vct.data() + sz; // skip N bytes -> buf+5
         memcpy(dst, o.m_vct.data(), o_sz); // cpy(&buf[5], src, 1) -> this copy 1 byte starting from address 5 which is writeable because the size is 6
+        //unsafe_memcpy(dst, o.m_vct.data(), o_sz); // cpy(&buf[5], src, 1) -> this copy 1 byte starting from address 5 which is writeable because the size is 6
 
         this->m_bit_capacity = 8 * m_vct.size();
         this->m_bit_idx += o.m_bit_idx;
