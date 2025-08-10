@@ -48,33 +48,18 @@ struct BitArray {
     }
 
 
-    // TODO: endianess template & cast to unsigned type internally, eventually use if constexpr and std::is_same
     template<typename TIntegral>
-    static BitArray from(TIntegral bits) {
-
-        static_assert(std::is_integral<TIntegral>::value, "TIntegral must be an integral type type");
-
-
-        const uint8_t bytes = sizeof(TIntegral);
-        BitArray ret{ (bytes+1) * 8};
-
-        memcpy(ret.m_vct.data(), &bits, bytes);
-
-        // TODO: iterator reverse()
-        //for (auto ret = std::end(ret); )
-
-        ret.m_bit_idx = (bytes+1) * 8;
-        return ret;
-    }
+    static BitArray from(TIntegral bits);
 
 
     struct BitArrayIterator; // forward declaration
 
-    using value_type      = bool;
-    using difference_type = std::ptrdiff_t;
-    using pointer         = value_type *;
-    using reference       = value_type &;
-    using const_iterator  = BitArrayIterator;
+    using value_type             = bool;
+    using difference_type        = std::ptrdiff_t;
+    using pointer                = value_type *;
+    using reference              = value_type &;
+    using const_iterator         = BitArrayIterator;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     explicit BitArray(uint32_t bit_length = 1):
         m_vct(bytes_required(bit_length)),
@@ -249,10 +234,15 @@ struct BitArray {
         m_bit_capacity = bit_length;
     }*/
 
-    const_iterator begin() const;
-    const_iterator   end() const;
-    const_iterator cbegin() const;
-    const_iterator   cend() const;
+    const_iterator   begin() const;
+    const_iterator     end() const;
+    const_iterator  cbegin() const;
+    const_iterator    cend() const;
+
+    const_reverse_iterator crbegin() const;
+    const_reverse_iterator   crend() const;
+    const_reverse_iterator  rbegin() const;
+    const_reverse_iterator    rend() const;
 
     inline const void * bitstream() const { return m_vct.data(); }
     FORCED(inline) const BitArray8 & back_byte() const {
@@ -273,7 +263,7 @@ struct BitArray {
 
     // cut away the padding bits from the last byte & return the last byte
     FORCED(inline) uint8_t back_byte_without_padding() const {
-        return has_padding_bits() ? back_byte().take_few(m_bit_idx & 7) : (uint8_t)back_byte(); // x&7 -> bit_length()%8
+        return has_padding_bits() ? back_byte().take_few(8-padding_bits()) : (uint8_t)back_byte(); // x&7 -> bit_length()%8
     }
 
     protected:
@@ -341,6 +331,13 @@ BitArray::const_iterator BitArray::cbegin() const { return std::cbegin(*this); }
 BitArray::const_iterator   BitArray::cend() const { return std::cend(*this);   }
 
 
+BitArray::const_reverse_iterator BitArray::rbegin() const { return std::reverse_iterator(this->end()); }
+BitArray::const_reverse_iterator   BitArray::rend() const { return std::reverse_iterator(this->begin()); }
+
+BitArray::const_reverse_iterator BitArray::crbegin() const { return std::crbegin(*this); }
+BitArray::const_reverse_iterator   BitArray::crend() const { return std::crend(*this); }
+
+
 BitArray & BitArray::operator+=(const BitArray &o) {
 
     assert(&o != this);
@@ -360,7 +357,6 @@ BitArray & BitArray::operator+=(const BitArray &o) {
 
         void *dst = m_vct.data() + sz; // skip N bytes -> buf+5
         memcpy(dst, o.m_vct.data(), o_sz); // cpy(&buf[5], src, 1) -> this copy 1 byte starting from address 5 which is writeable because the size is 6
-        //unsafe_memcpy(dst, o.m_vct.data(), o_sz); // cpy(&buf[5], src, 1) -> this copy 1 byte starting from address 5 which is writeable because the size is 6
 
         this->m_bit_capacity = 8 * m_vct.size();
         this->m_bit_idx += o.m_bit_idx;
@@ -376,3 +372,29 @@ BitArray & BitArray::operator+=(const BitArray &o) {
 
 
 static_assert(std::bidirectional_iterator<BitArray::BitArrayIterator>);
+
+
+// TODO: endianess template & cast to unsigned type internally, eventually use if constexpr and std::is_same
+template<typename TUnsigned>
+BitArray BitArray::from(TUnsigned bits) {
+
+    static_assert(std::is_unsigned_v<TUnsigned>, "TUnsigned must be an unsigned type");
+
+    const uint8_t bytes = sizeof(TUnsigned);
+    BitArray ret{bytes * 8};
+
+    /*
+    int idx_last_on = 0; // latest bit on in the sequence
+    for (int i = 0; i < bytes * 8; ++i) {
+        auto cur_bit = (bits >> i) & 1; // reverse the number, put the msb at left
+        if (!cur_bit) continue;
+        ret(i,  idx_last_on = i);
+    }
+
+    ret.m_bit_idx = idx_last_on + 1;
+     */
+
+    memcpy(ret.m_vct.data(), (const void *)&bits, bytes);
+    ret.m_bit_idx = bytes * 8;
+    return ret;
+}
