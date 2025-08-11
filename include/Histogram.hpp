@@ -83,7 +83,6 @@ struct Histogram {
         return m_frequency[ symbol ];
     }
 
-    // TODO: setters
     public:
         uint32_t m_frequency[256] {};
 };

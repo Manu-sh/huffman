@@ -83,7 +83,7 @@ struct Hafe {
         // TOP:
         uint8_t m_magic[4] {};
         [[maybe_unused]] uint8_t m_reserved[16];
-        uint32_t m_symbol_table_disk_bsize; // TODO: empty rows aren't stored on disk but they must be accessible later, if you have 10 non-empty rows this values is 10 but you have to allocate 256
+        uint32_t m_symbol_table_disk_bsize; // empty rows aren't stored on disk but they must be accessible later, if you have 10 non-empty rows this values is 10 but you have to allocate 256
 
         // SymTable
         SymbolTable m_symbol_table;

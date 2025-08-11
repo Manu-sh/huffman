@@ -556,46 +556,19 @@ TEST_CASE("testing advance compare") {
 
 TEST_CASE("testing BitArray::from()") {
 
-
     {
         BitArray a; a.push_back(1).push_back(1).push_back(1);
-        BitArray b; b.push_back(1).push_back(1).push_back(1);
-        REQUIRE(a == b);
-    }
-
-
-    {
-        BitArray a = BitArray::from<uint8_t>(0b111);
-        BitArray b = BitArray::from<uint8_t>(0b111);
-        REQUIRE(a.bit_capacity() == 8);
-        REQUIRE(b.bit_capacity() == 8);
-        REQUIRE(a == b);
-    }
-
-
-    {
-        BitArray a = BitArray::from(uint8_t(0b111));
-        BitArray b = BitArray::from(uint8_t(0b111));
-        REQUIRE(a.bit_capacity() == 8);
-        REQUIRE(b.bit_capacity() == 8);
+        BitArray b = "111"_vbit;
         REQUIRE(a == b);
     }
 
     {
-        BitArray a = BitArray::from(uint16_t(0b111));
-        BitArray b = BitArray::from(uint16_t(0b111));
-        REQUIRE(a.bit_capacity() == 8 * sizeof(uint16_t));
+        BitArray a = "111"_vbit;
+        BitArray b = "111"_vbit;
+        REQUIRE(a.bit_capacity() == 8 * sizeof(uint8_t));
         REQUIRE(a.bit_capacity() == b.bit_capacity());
         REQUIRE(a == b);
     }
 
-
-    {
-        BitArray a = BitArray::from(uint32_t(0b111));
-        BitArray b = BitArray::from(uint32_t(0b111));
-        REQUIRE(a.bit_capacity() == 8 * sizeof(uint32_t));
-        REQUIRE(a.bit_capacity() == b.bit_capacity());
-        REQUIRE(a == b);
-    }
 
 }

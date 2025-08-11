@@ -48,15 +48,6 @@ struct BitArray {
         return m_bit_idx - (m_bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
     }
 
-
-    template <typename TUnsigned>
-    static BitArray from(TUnsigned bits) requires std::is_unsigned_v<TUnsigned>;
-
-#if 0
-    template <>
-    static BitArray from(std::string_view bits);
-#endif
-
     struct BitArrayIterator; // forward declaration
 
     using value_type             = bool;
@@ -120,7 +111,9 @@ struct BitArray {
         m_bit_idx = bit_length;
     }
 
-    // TODO: mettere la move e rendere explicit
+    BitArray(BitArray &&o) = default;
+    BitArray & operator=(BitArray &&o) = default;
+
     BitArray(const BitArray &o) {
         this->operator=(o);
     }
@@ -380,40 +373,10 @@ BitArray & BitArray::operator+=(const BitArray &o) {
 
 static_assert(std::bidirectional_iterator<BitArray::BitArrayIterator>);
 
+BitArray operator ""_vbit(const char *s, size_t len) {
+    BitArray bits;
+    for (size_t i = 0; i < len; ++i)
+        bits.push_back(!!(s[i] - '0'));
 
-// TODO: endianess template & cast to unsigned type internally, eventually use if constexpr and std::is_same
-template <typename TUnsigned>
-BitArray BitArray::from(TUnsigned bits) requires std::is_unsigned_v<TUnsigned> {
-
-    //static_assert(, "TUnsigned must be an unsigned type");
-
-    const uint8_t bytes = sizeof(TUnsigned);
-    BitArray ret{bytes * 8};
-
-    /*
-    int idx_last_on = 0; // latest bit on in the sequence
-    for (int i = 0; i < bytes * 8; ++i) {
-        auto cur_bit = (bits >> i) & 1; // reverse the number, put the msb at left
-        if (!cur_bit) continue;
-        ret(i,  idx_last_on = i);
-    }
-
-    ret.m_bit_idx = idx_last_on + 1;
-     */
-
-    memcpy(ret.m_vct.data(), (const void *)&bits, bytes);
-    ret.m_bit_idx = bytes * 8;
-    return ret;
+    return bits;
 }
-
-#if 0
-template<>
-BitArray BitArray::from(std::string_view bits) {
-
-    BitArray ret;
-    for (uint8_t ch : bits)
-        ret.push_back(ch - '0');
-
-    return ret;
-}
-#endif

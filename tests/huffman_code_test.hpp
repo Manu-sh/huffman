@@ -27,43 +27,27 @@ using namespace std;
 TEST_CASE("testing HuffmanCode") {
 
     {
-        HuffmanCode a = HuffmanCode::from<uint8_t>(0b111);
-        HuffmanCode b = HuffmanCode::from<uint8_t>(0b0000'0111);
+        HuffmanCode a = "111"_vbit;
+        HuffmanCode b = "00000111"_vbit;
 
         cout << a.str() << endl;
-        REQUIRE(a.bit_length() == 8);
+        REQUIRE(a.bit_length() == 3);
         REQUIRE(a.bit_capacity() == 8);
-        REQUIRE(a.padding_bits() == 0);
-        REQUIRE(a.has_padding_bits() == false);
+        REQUIRE(a.padding_bits() == 5);
+        REQUIRE(a.has_padding_bits() == true);
         REQUIRE(b.bit_length() == 8);
-        REQUIRE(b.bit_capacity() == 8);
+        REQUIRE(b.bit_capacity() == 16);
         REQUIRE(b.padding_bits() == 0);
         REQUIRE(b.has_padding_bits() == false);
-
-        REQUIRE((uint8_t)a.back_byte() == 0b111);
-        REQUIRE(a.back_byte_without_padding() == 0b111);
-        REQUIRE((uint8_t)a.back_byte() == a.back_byte_without_padding());
-
-        REQUIRE((uint8_t)b.back_byte() == 0b111);
-        REQUIRE(b.back_byte_without_padding() == 0b111);
-        REQUIRE((uint8_t)b.back_byte() == b.back_byte_without_padding());
-        REQUIRE((uint8_t)a.back_byte() == (uint8_t)b.back_byte());
-        REQUIRE(a.back_byte_without_padding() == b.back_byte_without_padding());
-
-        REQUIRE(a == b);
+        REQUIRE(b.str() == "00000111");
 
     }
 
     {
-        HuffmanCode a = HuffmanCode::from<uint8_t>(0b111);
-        //HuffmanCode b = HuffmanCode::from<uint8_t>(0b1110'0000);
-        HuffmanCode b = HuffmanCode::from<uint8_t>(0b111);
-        REQUIRE(a.str() == "00000111");
+        HuffmanCode a = "111"_vbit;
+        HuffmanCode b = "111"_vbit;
+        REQUIRE(a.str() == "111");
         REQUIRE(a.str() == b.str());
-
-        // TODO:
-        // REQUIRE(HuffmanCode::from("00000111").str() == "00000111");
-
 
     }
 
