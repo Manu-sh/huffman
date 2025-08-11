@@ -21,7 +21,7 @@ struct HuffmanTree {
 
         if (m_height > 0) return m_height;
 
-        // lazy on initialization
+        // lazy on m_height initialization
         HuffmanNode::recursive_dfs([this] ([[maybe_unused]] const HuffmanNode *node, uint32_t cur_depth) {
             if (cur_depth > this->m_height)
                 this->m_height = cur_depth;

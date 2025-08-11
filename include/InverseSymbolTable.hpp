@@ -9,6 +9,9 @@
 #include <HuffmanCode.hpp>
 #include <math/math.hpp>
 
+#include <functional>
+#include <algorithm>
+
 struct InverseSymbolTable final { // faster than unordered_map
 
     // if bit_sequence correspond to a valid huffman code the original symbol is returned
@@ -29,6 +32,7 @@ struct InverseSymbolTable final { // faster than unordered_map
             const auto &pair = bucket[i];
             if (bit_sequence == pair.first)
                 return &pair.second;
+            //std::cout << "confronti: " << (i+1) << std::endl;
         }
 
         return nullptr;

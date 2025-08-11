@@ -2,8 +2,15 @@
 #include <cmath>
 #include <cstdint>
 #include <cassert>
+#include <type_traits>
 
 #include <common.hpp>
+
+
+template<typename T>
+static constexpr uint8_t msb(T number) requires std::is_integral_v<T> {
+    return number >> (sizeof(T) - 1);
+}
 
 
 // il logaritmo in base X di un argomento A si può calcolare

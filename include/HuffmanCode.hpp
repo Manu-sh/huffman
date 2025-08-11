@@ -11,59 +11,34 @@ struct HuffmanCode: BitArray {
     using BitArray::BitArray;
 
     HuffmanCode(BitArray &&b) {
+        static_assert(sizeof(HuffmanCode) == sizeof(BitArray), "update if the memory layout differs");
         *((BitArray *)this) = std::move(b); // update if the memory layout differs
     }
 
-    friend FORCED(inline) int64_t operator<=>(const HuffmanCode &a, const HuffmanCode &b) {
+#if 0
+    friend FORCED(inline) int operator<=>(const HuffmanCode &a, const HuffmanCode &b) {
         return a <=> ((const BitArray &)b);
     }
 
-    friend FORCED(inline) int64_t operator<=>(const BitArray &a, const HuffmanCode &b) {
+    friend FORCED(inline) int operator<=>(const BitArray &a, const HuffmanCode &b) {
         return b <=> a;
     }
 
-    // TODO: attualmente non è usata, rimuovere o sistemare
-    friend FORCED(inline) int64_t operator<=>(const HuffmanCode &a, const BitArray &b) {
+    friend FORCED(inline) int operator<=>(const HuffmanCode &a, const BitArray &b) { // untested, unused but should be fine
 
         if (a.bit_length() != b.bit_length())
             return a.bit_length() > b.bit_length() ? 1 : -1;
 
-#if 0
-        size_t full_bytes = a.effective_byte_size();
-        if (a.has_padding_bits())
-            full_bytes--;
+        // potrebbero essere 2 elementi di dimensione 0 con bit non inizializzati, è gestito sotto nell'if
+        int cmp_second = a.back_byte_without_padding() - b.back_byte_without_padding();
 
-        if (int cmp = memcmp(a.bitstream(), b.bitstream(), full_bytes))
-            return cmp;
+        if (a.effective_byte_size() <= 1) // *bitstream() è grande esattamente 1 byte, evita di passare a memcmp() perchè con effective_byte_size == 0 giustamente scazza e questo numero può essere 0
+            return a.bit_length() == 0 ? 0 : (cmp_second < 0 ? -1 : cmp_second > 0); // -1, 0, 1
 
-        // Se c'è un ultimo byte parziale
-        if (a.has_padding_bits()) {
-            uint8_t last_a = a.back_byte_without_padding();
-            uint8_t last_b = b.back_byte_without_padding();
-            if (last_a < last_b) return -1;
-            if (last_a > last_b) return 1;
-        }
-
-        return 0;
-
-#else
-        bool skip_last_byte = 0;
-        int cmp = 0;
-
-        if (a.has_padding_bits() || b.has_padding_bits()) { // test if the last byte has all bits used (no padding)
-
-            skip_last_byte = 1;
-            cmp = a.back_byte_without_padding() - b.back_byte_without_padding();
-
-            if (a.effective_byte_size() == 1) // è grande esattamente 1 byte, evita di passare a memcmp() perchè con size 0 giustamente scazza
-                return cmp;
-        }
-
-        int chunk_order = memcmp(a.bitstream(), b.bitstream(), a.effective_byte_size() - skip_last_byte);
-        return skip_last_byte ? (chunk_order+cmp) : chunk_order;
-#endif
+        int cmp_first = memcmp(a.bitstream(), b.bitstream(), a.effective_byte_size() - 1); // "For a nonzero return value, the sign is determined by the sign of the difference between the first pair of bytes (interpreted as unsigned char) that differ in s1 and s2"
+        return cmp_first < cmp_second ? -1 : cmp_first > cmp_second;
     }
-
+#endif
 
 };
 

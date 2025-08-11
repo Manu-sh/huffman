@@ -65,14 +65,16 @@ struct BitArray {
     using reference              = value_type &;
     using const_iterator         = BitArrayIterator;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    //using move_iterator          = std::move_iterator<BitArrayIterator>;
 
     explicit BitArray(uint32_t bit_length = 1):
         m_vct(bytes_required(bit_length)),
         m_bit_capacity{bytes_required(bit_length) * 8} // number of bit slots effectively available
     {
 
+        // you can still have 0 length using pop_back() but the capacity can't be 0
         if (bit_length == 0)
-            throw std::runtime_error{"invalid argument bit_length=0 is not accepted"};
+            throw std::runtime_error{"object creation will be result in bits(0) capacity which is not allowed"};
     }
 
     explicit BitArray(BitArray8 *vct, uint64_t byte_length, uint64_t bit_length) {
@@ -146,9 +148,9 @@ struct BitArray {
             return false;
 
         if (back_byte_without_padding() != o.back_byte_without_padding())
-            return false;
+            return bit_length() != 0; // potrebbero essere 2 elementi entrambi di dimensione 0 non inizializzati
 
-        // *bistream() è grande esattamente 1 byte, evita di passare a memcmp()
+        // *bitstream() è grande esattamente 1 byte, evita di passare a memcmp()
         // perchè con effective_byte_size == 0 giustamente scazza e questo numero può essere 0
         if (effective_byte_size() <= 1)
             return true;
@@ -247,10 +249,12 @@ struct BitArray {
 
     inline const void * bitstream() const { return m_vct.data(); }
     FORCED(inline) const BitArray8 & back_byte() const {
+        assert(bit_length() > 0);
         return m_vct[last_element_byte_idx()];
     }
 
     FORCED(inline) BitArray8 & back_byte() {
+        assert(bit_length() > 0);
         return m_vct[last_element_byte_idx()];
     }
 
@@ -298,6 +302,7 @@ struct BitArray::BitArrayIterator {
         //std::cout << "index: " << m_index << std::endl;
         return m_instance->operator[](m_index);
     }
+
 
     BitArrayIterator & operator++() {
         return ++m_index, *this;
@@ -349,7 +354,7 @@ BitArray & BitArray::operator+=(const BitArray &o) {
 
     // we are lucky 'cause we can block-copy
     //if (this->bit_length() % 8 == 0) {
-    if (!(m_bit_idx & 7)) {
+    if (!(bit_length() & 7)) {
 
         auto sz = effective_byte_size(); // ATTENTION!!! this value can be 0, usually memory size is never 0 i dont wanna change the entire logic
         auto o_sz = o.effective_byte_size();
