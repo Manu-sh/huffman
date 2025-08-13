@@ -4,13 +4,9 @@
 #include <utility>
 #include <memory>
 #include <cstdlib>
-#include <algorithm>
 
 #include <HuffmanCode.hpp>
 #include <math/math.hpp>
-
-#include <functional>
-#include <algorithm>
 
 struct InverseSymbolTable final { // faster than unordered_map
 

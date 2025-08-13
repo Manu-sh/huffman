@@ -83,7 +83,6 @@ struct BitArray {
 
         m_vct.resize(required_bytes);
         memcpy(m_vct.data(), vct, required_bytes);
-        //unsafe_memcpy(m_vct.data(), vct, required_bytes);
 
         m_bit_capacity = required_bytes << 3; // required_bytes * 8
         m_bit_idx = bit_length;
@@ -167,24 +166,19 @@ struct BitArray {
     bool operator[](uint64_t i) const {
         assert(i < m_bit_capacity);
         const auto byte_idx = i >> 3; // (i/8)
-        //const BitArray8 &bit_a = m_vct.at(byte_idx);
         const BitArray8 &bit_a = m_vct[byte_idx];
         return bit_a[i&7]; // i%8
     }
 
     void operator()(uint64_t i, bool value) {
         const auto byte_idx = i >> 3; // (i/8)
-        //BitArray8 &bit_a = m_vct.at(byte_idx);
         BitArray8 &bit_a = m_vct[byte_idx];
         return (void)bit_a(i&7, value); // i%8
     }
 
-    bool back() const { // if is_empty() calling back() result in UB and is your fault
+    bool back() const {
         assert(!empty());
-        return this->operator[](
-                //m_bit_idx - (m_bit_idx != 0) // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
-                last_bit_idx()
-        );
+        return this->operator[](last_bit_idx());
     }
 
     FORCED(inline) BitArray & push_back(bool value) {
@@ -363,7 +357,6 @@ BitArray & BitArray::operator+=(const BitArray &o) {
         return *this;
     }
 
-    //for (bool bit : o) this->push_back(bit);
     for (uint64_t i = 0, len = o.bit_length(); i < len; ++i)
         this->push_back(o[i]);
 
