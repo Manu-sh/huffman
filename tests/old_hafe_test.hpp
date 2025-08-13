@@ -127,6 +127,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         REQUIRE(st.longest().bit_length() == tree.height());
 
         const auto &symbol_table = st.borrow();
+#if 0
         {
             ShannonHistogram recalc{symbol_table, str.length()};
             for (auto [s, f] : recalc) {
@@ -139,7 +140,7 @@ TEST_CASE("testing .hafe compress & decompress") {
                 REQUIRE(freq.total_bytes() == recalc.total_bytes());
             }
         }
-
+#endif
 
         std::shared_ptr<BitArray> shp_bitstream = Encoder::encode(st, str);
 

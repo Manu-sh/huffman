@@ -46,10 +46,12 @@ struct Decoder {
     inline const auto & str()               const { return *m_str;                  }
     inline double compression_ratio_pct()   const { return ::compression_ratio(m_bitstream.borrow().bit_length(), m_str->length() * 8); }
 
+#if 0
     inline const auto & shannon_histogram() const {
         static const ShannonHistogram histogram{m_symbol_table.borrow(), m_str->length()};
         return histogram;
     }
+#endif
 
     protected:
         SymbolTable m_symbol_table;

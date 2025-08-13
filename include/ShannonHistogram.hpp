@@ -36,6 +36,8 @@ struct ShannonHistogram: public Histogram {
         using (symbol, huffman_code.length()) with the length of the original uncompressed input
         is possible gets back: probability, frequency, self_information of given symbol.
      */
+#if 0
+    // putroppo non è esatto al 100%
     explicit ShannonHistogram(const std::vector<HuffmanCode> &symbol_table, uint64_t uncompressed_input_length)
         : m_original_dataset_length{uncompressed_input_length} {
 
@@ -54,6 +56,7 @@ struct ShannonHistogram: public Histogram {
 
         m_total_bits = m_avg_bit_per_symbol * m_original_dataset_length;
     }
+#endif
 
     explicit ShannonHistogram(const uint8_t *data, uint64_t len): Histogram{data, len}, m_original_dataset_length{len} {
 
