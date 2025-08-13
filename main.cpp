@@ -45,7 +45,16 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
 
     const auto &symbol_table = decoder.symbol_table();
     assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
+
+#if 0
+ShannonHistogram hist = decoder.shannon_histogram();
+    for (int i = 0; i < HuffmanCode::MAX_LENGTH; ++i) {
+        if (hist.has(i)) hist.dump_entry(i);
+    }
+
     //symbol_table.print();
+    return 0;
+#endif
 
     cout.write((char *)decoder.str().data(), decoder.str().length());
 

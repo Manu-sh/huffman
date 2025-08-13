@@ -46,6 +46,8 @@ struct ShannonHistogram: public Histogram {
             const auto &huffman_code = symbol_table[sym];
             if (huffman_code.empty()) continue;
             m_map[sym].probability      = shannon_probability(huffman_code.bit_length()); // 2**-length
+            std::cout << huffman_code.bit_length() << std::endl;
+            std::cout << m_map[sym].probability << std::endl;
             m_map[sym].self_information = shannon_self_information(m_map[sym].probability);
             m_frequency[sym]            = m_map[sym].probability * m_original_dataset_length; // calc frequency
         }
@@ -77,6 +79,10 @@ struct ShannonHistogram: public Histogram {
 
     inline double information(uint8_t sym) const noexcept {
         return m_map[sym].self_information;
+    }
+
+    inline bool has(uint8_t sym) const noexcept {
+        return (bool)m_frequency[sym];
     }
 
     void dump_entry(uint8_t symbol) const {
