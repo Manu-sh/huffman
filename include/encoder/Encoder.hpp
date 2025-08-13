@@ -7,12 +7,7 @@
 #include <HuffmanTree.hpp>
 #include <BitStream.hpp>
 
-/*
-static std::ostream & print_compression_stats(const BitArray &compressed, const std::string &uncompressed) {
-    std::cout << compressed.bit_length() << '/' << (uncompressed.length() * 8) << " bits" << '\n';
-    return std::cout << ::compression_ratio(compressed.bit_length(), uncompressed.length() * 8) << '%' << std::endl;
-}
-*/
+
 struct Encoder {
 
     static std::shared_ptr<BitArray> encode(const SymbolTable &st, const std::string &str) {

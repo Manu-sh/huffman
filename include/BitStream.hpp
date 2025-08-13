@@ -8,8 +8,6 @@ struct BitStream {
         BitStream() = default;
         BitStream(std::shared_ptr<BitArray> self): m_self{self} {}
 
-        //explicit BitStream(const std::string &to_encode)
-
         inline const auto & borrow() const { return *m_self; }
         inline auto share() const { return m_self; }
 

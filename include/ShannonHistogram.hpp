@@ -30,34 +30,6 @@ struct ShannonHistogram: public Histogram {
 
     ShannonHistogram() = default;
 
-    /* Con le lunghezze dei vari codici di huffman e la lunghezza dell'input originale non compresso
-        posso risalire alle frequenze e costruire uno shannon histogram
-
-        using (symbol, huffman_code.length()) with the length of the original uncompressed input
-        is possible gets back: probability, frequency, self_information of given symbol.
-     */
-#if 0
-    // putroppo non è esatto al 100%
-    explicit ShannonHistogram(const std::vector<HuffmanCode> &symbol_table, uint64_t uncompressed_input_length)
-        : m_original_dataset_length{uncompressed_input_length} {
-
-        assert(symbol_table.size() == SymbolTable::MAX_SYMBOLS);
-
-        m_avg_bit_per_symbol = 0;
-        for (uint16_t sym = 0; sym < symbol_table.size(); ++sym) {
-            const auto &huffman_code = symbol_table[sym];
-            if (huffman_code.empty()) continue;
-            m_map[sym].probability      = shannon_probability(huffman_code.bit_length()); // 2**-length
-            std::cout << huffman_code.bit_length() << std::endl;
-            std::cout << m_map[sym].probability << std::endl;
-            m_map[sym].self_information = shannon_self_information(m_map[sym].probability);
-            m_frequency[sym]            = m_map[sym].probability * m_original_dataset_length; // calc frequency
-        }
-
-        m_total_bits = m_avg_bit_per_symbol * m_original_dataset_length;
-    }
-#endif
-
     explicit ShannonHistogram(const uint8_t *data, uint64_t len): Histogram{data, len}, m_original_dataset_length{len} {
 
         // This calculates the first-order entropy, which is approximate because it doesn't take into account the dependencies between symbols.
