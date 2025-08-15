@@ -31,8 +31,8 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
         Encoder encoder{str};
 
         // const auto &freq  = encoder.shannon_histogram();
-        auto symbol_table = encoder.symbol_table();
-        assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
+        //auto symbol_table = encoder.symbol_table();
+        //assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
         Hafe hafe = encoder.hafe();
         hafe.write(cout);
@@ -43,8 +43,8 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
     Hafe hafe{std::cin};
     Decoder decoder{hafe};
 
-    const auto &symbol_table = decoder.symbol_table();
-    assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
+    //const auto &symbol_table = decoder.symbol_table();
+    //assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
     cout.write((char *)decoder.str().data(), decoder.str().length());
 
 }

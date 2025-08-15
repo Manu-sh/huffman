@@ -154,7 +154,7 @@ struct BitArray {
     FORCED(inline) uint64_t bit_capacity() const noexcept { return m_bit_capacity;    } // in this container bit_capacity()-1 is always accessible, this value is at least 1
     FORCED(inline)     bool empty()        const noexcept { return !m_bit_idx;        }
 
-    inline void clear() {
+    FORCED(inline) void clear() {
 
         m_vct.clear();
         m_vct.resize(1);
@@ -163,14 +163,14 @@ struct BitArray {
         m_bit_capacity = bytes_required(1) * 8;
     }
 
-    bool operator[](uint64_t i) const {
+    FORCED(inline) bool operator[](uint64_t i) const {
         assert(i < m_bit_capacity);
         const auto byte_idx = i >> 3; // (i/8)
         const BitArray8 &bit_a = m_vct[byte_idx];
         return bit_a[i&7]; // i%8
     }
 
-    void operator()(uint64_t i, bool value) {
+    FORCED(inline) void operator()(uint64_t i, bool value) {
         const auto byte_idx = i >> 3; // (i/8)
         BitArray8 &bit_a = m_vct[byte_idx];
         return (void)bit_a(i&7, value); // i%8

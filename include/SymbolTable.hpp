@@ -67,7 +67,7 @@ std::shared_ptr<std::vector<HuffmanCode>> SymbolTable::build_symbol_table(const 
     auto &huffman_code = *shp_symbol_table.get();
 
     if (root->is_leaf()) {
-        huffman_code[root->leaf_data.symbol].push_back(CHILD_LEFT);
+        huffman_code[root->m_symbol].push_back(CHILD_LEFT);
         return shp_symbol_table;
     }
 
@@ -77,7 +77,7 @@ std::shared_ptr<std::vector<HuffmanCode>> SymbolTable::build_symbol_table(const 
         open.pop_front();
 
         if (node->is_leaf()) {
-            huffman_code[node->leaf_data.symbol] = path;
+            huffman_code[node->m_symbol] = path;
             continue;
         }
 

@@ -12,7 +12,7 @@ struct Encoder {
 
     static std::shared_ptr<BitArray> encode(const SymbolTable &st, const std::string &str) {
 
-        auto shp_encoded = std::make_shared<BitArray>();
+        auto shp_encoded = std::make_shared<BitArray>(str.length() * 8);
         auto &encoded = *shp_encoded;
         const std::vector<HuffmanCode> &symbol_table = st.borrow();
 

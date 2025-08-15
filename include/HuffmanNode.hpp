@@ -29,18 +29,18 @@ struct HuffmanNode final {
 
 
     inline explicit HuffmanNode(uint8_t symbol, uint32_t frequency) noexcept: m_child{} { // construct an huffman node as leaf
-        leaf_data.symbol = symbol;
-        leaf_data.freq   = frequency;
+        m_symbol = symbol;
+        m_freq   = frequency;
     }
 
     // NOTE: huffman ha problemi di overflow, dal momento che ogni nodo superiore costituisce la somma di altri 2 se 2 foglie fossero con frequenza altissima es. 2**32
     //     i loro genitori su nella gerarchia possono mandare in overflow un uint64
 
-    inline explicit HuffmanNode(HuffmanNode *left, HuffmanNode* right): m_child{left,right} { // construct an huffman node as subtree having n1 and n2 has child
+    inline explicit HuffmanNode(HuffmanNode *left, HuffmanNode *right): m_child{left,right} { // construct an huffman node as subtree having n1 and n2 has child
         assert(left && right);
 
-        uint64_t fl = left->freq();
-        uint64_t fr = right->freq();
+        const uint64_t &fl = left->m_freq;
+        const uint64_t &fr = right->m_freq;
 
         if (fl >= std::numeric_limits<uint32_t>::max() || fr >= std::numeric_limits<uint32_t>::max())
             throw std::runtime_error{"overflow detected"};
@@ -48,24 +48,23 @@ struct HuffmanNode final {
         if (fl+fr >= std::numeric_limits<uint32_t>::max())
             throw std::runtime_error{"overflow detected"};
 
-        freq_sum = fl + fr; // F = n1.freq + n2.freq
-        //freq_sum = left->freq() + right->freq(); // F = n1.freq + n2.freq
+        m_freq = fl + fr; // F = n1.freq + n2.freq
     }
 
     inline bool  is_leaf() const noexcept { return m_child[CHILD_LEFT] == m_child[CHILD_RIGHT]; } // nullptr == nullptr
-    inline uint64_t freq() const noexcept { return is_leaf() ? leaf_data.freq : freq_sum; }
+    inline uint64_t freq() const noexcept { return m_freq; }
 
 
     std::string name() const {
 
         if (!this->is_leaf())
-            return std::to_string(this->freq());
+            return std::to_string(this->m_freq);
 
         std::ostringstream os;
-        if (std::isalnum(this->leaf_data.symbol))
-            os << char(this->leaf_data.symbol);
+        if (std::isalnum(this->m_symbol))
+            os << char(this->m_symbol);
         else
-            os << (void*)(long)(this->leaf_data.symbol); // force 2hex conv
+            os << (void*)(long)(this->m_symbol); // force 2hex conv
 
         os << ':' << this->freq();
         return os.str();
@@ -92,12 +91,7 @@ struct HuffmanNode final {
 
         // you don't need to store frequencies infos into a node since they are used only during the tree building phase,
         // i do for debugging purpose and for accessing in O(1) during the tree-building
-        union {
-            uint64_t freq_sum;
-            struct {
-                uint32_t freq;
-                uint8_t symbol;
-            } leaf_data;
-        };
+        uint64_t m_freq;
+        uint8_t m_symbol;
 
 };
