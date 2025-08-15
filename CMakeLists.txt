@@ -4,8 +4,8 @@ project(huffman)
 set(CMAKE_CXX_STANDARD 20)
 
 if(NOT CMAKE_BUILD_TYPE)
-    #set(CMAKE_BUILD_TYPE Release)
-    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_BUILD_TYPE Release)
+    #set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 #set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
@@ -34,20 +34,20 @@ target_compile_options(${PROJECT_NAME}
         #-D_FORTIFY_SOURCE=2
         #-ftrapv
         -z,stack-size=786433
-        -fstack-protector-all -fstack-protector-strong
+        #-fstack-protector-all -fstack-protector-strong
         -fno-builtin-memcpy
         #-fno-tree-builtin-call-dce
 
         #-fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable
-        -g3 -fno-omit-frame-pointer
-        -O0
-        #-O3 -ffast-math -funroll-loops -march=native -mtune=native
-        #-funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
+        #-g3 -fno-omit-frame-pointer
+        #-O0
+        -O3 -ffast-math -funroll-loops -march=native -mtune=native
+        -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
 )
 
 # yay -S --noconfirm doctest
-include(CTest)
-if(BUILD_TESTING)
-    message("Config build type: ${CMAKE_BUILD_TYPE}")
-    add_subdirectory(tests)
-endif()
+#include(CTest)
+#if(BUILD_TESTING)
+#    message("Config build type: ${CMAKE_BUILD_TYPE}")
+#    add_subdirectory(tests)
+#endif()
