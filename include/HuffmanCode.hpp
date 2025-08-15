@@ -10,6 +10,9 @@ struct HuffmanCode: BitArray {
 
     using BitArray::BitArray;
 
+	//HuffmanCode(): BitArray{48} {}
+	HuffmanCode(): BitArray{HuffmanCode::MAX_LENGTH} {}
+
     HuffmanCode(BitArray &&b) {
         static_assert(sizeof(HuffmanCode) == sizeof(BitArray), "update if the memory layout differs");
         *((BitArray *)this) = std::move(b); // update if the memory layout differs
