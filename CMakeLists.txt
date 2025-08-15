@@ -41,7 +41,8 @@ target_compile_options(${PROJECT_NAME}
         #-fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable
         #-g3 -fno-omit-frame-pointer
         #-O0
-        -O3 -ffast-math -funroll-loops -march=native -mtune=native
+        -DNDebug
+        -Ofast -ffast-math -funroll-loops -march=native -mtune=native
         -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
 )
 

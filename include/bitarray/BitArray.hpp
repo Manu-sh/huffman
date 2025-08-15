@@ -235,6 +235,12 @@ struct BitArray {
     const_reverse_iterator    rend() const;
 
     inline const void * bitstream() const { return m_vct.data(); }
+    inline uint8_t * data() const { return (uint8_t *)m_vct.data(); }
+
+    inline void bit_length(uint64_t bit_length) {
+        m_bit_idx = bit_length;
+    }
+
     FORCED(inline) const BitArray8 & back_byte() const {
         assert(bit_length() > 0);
         return m_vct[last_element_byte_idx()];
@@ -332,7 +338,7 @@ BitArray::const_reverse_iterator BitArray::crbegin() const { return std::crbegin
 BitArray::const_reverse_iterator   BitArray::crend() const { return std::crend(*this); }
 
 
-BitArray & BitArray::operator+=(const BitArray &o) {
+FORCED(inline) BitArray & BitArray::operator+=(const BitArray &o) {
 
     assert(&o != this);
 
@@ -341,12 +347,13 @@ BitArray & BitArray::operator+=(const BitArray &o) {
 
     // we are lucky 'cause we can block-copy
     //if (this->bit_length() % 8 == 0) {
-    if (!(bit_length() & 7)) {
+    //if (!(bit_length() & 7)) {
+    if (!has_padding_bits()) {
 
         auto sz = effective_byte_size(); // ATTENTION!!! this value can be 0, usually memory size is never 0 i dont wanna change the entire logic
         auto o_sz = o.effective_byte_size();
 
-        m_vct.resize( sz + o_sz ); // 5+1 = 6
+        if (m_bit_capacity < sz + o_sz) m_vct.resize( sz + o_sz ); // 5+1 = 6
         assert(&(o.m_vct) != &(this->m_vct));  // non dovrebbe mai succedere, eventualmente se &o == this usare memmove()
 
         void *dst = m_vct.data() + sz; // skip N bytes -> buf+5

@@ -40,7 +40,7 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
     }
 
 
-    Hafe hafe{std::cin};
+    Hafe hafe{cin};
     Decoder decoder{hafe};
 
     //const auto &symbol_table = decoder.symbol_table();
