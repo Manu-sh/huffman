@@ -33,7 +33,7 @@ target_compile_options(${PROJECT_NAME}
         -Wall -Wextra -Wno-unused-function -pipe
         #-D_FORTIFY_SOURCE=2
         #-ftrapv
-        -z,stack-size=786433
+        #-z,stack-size=786433
         #-fstack-protector-all -fstack-protector-strong
         -fno-builtin-memcpy
         #-fno-tree-builtin-call-dce

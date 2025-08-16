@@ -2,8 +2,8 @@
 #include <cstdint>
 #include <cctype>
 #include <cassert>
-#include <sstream>
 #include <memory>
+#include <format>
 
 struct HuffmanNode final {
 
@@ -60,14 +60,7 @@ struct HuffmanNode final {
         if (!this->is_leaf())
             return std::to_string(this->m_freq);
 
-        std::ostringstream os;
-        if (std::isalnum(this->m_symbol))
-            os << char(this->m_symbol);
-        else
-            os << (void*)(long)(this->m_symbol); // force 2hex conv
-
-        os << ':' << this->freq();
-        return os.str();
+        return std::isalnum(m_symbol) ? std::format("{}:{}", char(m_symbol), m_freq) : std::format("{}:{}", (void*)(long)m_symbol, m_freq); // force 2hex conv
     }
 
 
@@ -76,13 +69,7 @@ struct HuffmanNode final {
         if (this->is_leaf())
             return this->name();
 
-        std::ostringstream os;
-        os << "[ " << this->freq() << " ] " << this << '\n'
-            << "  left:  "  << this->m_child[CHILD_LEFT]
-            << "  right:  " << this->m_child[CHILD_RIGHT]
-            << '\n';
-
-        return os.str();
+        return std::format("[{}] {}\n  left: {}  right: {}\n", m_freq, (void *)this, (void *)m_child[CHILD_LEFT], (void *)m_child[CHILD_RIGHT]);
     }
 
     protected:
