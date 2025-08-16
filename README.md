@@ -3,7 +3,7 @@
 
 Nice to have / Future or TODOs:
 - improve bitarray classe removing the dipendence from std::vector and use a custom one or a simple block of memory (i need to access the underlying capacity), the memory could be aligned but with posix_memalign or similar to exploit avx etc
-- HuffmanCode buffer could live into the stack aligned memory chunk since it's at most uint8_t[256] this affect memory because mostly are smaller but can produce a better performance, using a custom allocator is also a solution but introduce more complexity
+- HuffmanCode buffer could live into the stack since it's at most uint8_t[256] (an aligned 32 byte memory chunk) this affect memory because mostly are smaller but can produce a better performance, using a custom allocator is also a solution but introduce more complexity
 - reconstruct a tree from symbol table path stored in hafe file (the hashmap solution for decoding require a bit of overhead but still constant), since different huffman impl. can produce differents huffman codes if you want store tree there are 2 possibility: describe how to store tree into the format specs. or reconstruct from the symbol table.
 - HuffmanNode doesn't need to keep frequency, frequency could be stored into a different structure this reduce memory consumpion but introduce more complexity (IMHO it's bad)
 
