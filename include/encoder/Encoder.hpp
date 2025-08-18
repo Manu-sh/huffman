@@ -31,6 +31,7 @@ struct Encoder {
         uint64_t bits = 0;
 
         for (uint8_t ch : str) {
+
             const auto &enc = symbol_table[ch];
             /*
             if (!enc.has_padding_bits() && !(bits&7)) {
@@ -44,7 +45,6 @@ struct Encoder {
         }
 
         encoded.bit_length(bits);
-
         return shp_encoded;
     }
 

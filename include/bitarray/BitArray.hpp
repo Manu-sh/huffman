@@ -58,7 +58,7 @@ struct BitArray {
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     //using move_iterator          = std::move_iterator<BitArrayIterator>;
 
-    explicit BitArray(uint32_t bit_length = 1):
+    explicit BitArray(uint64_t bit_length = 1):
         m_vct(bytes_required(bit_length)),
         m_bit_capacity{bytes_required(bit_length) * 8} // number of bit slots effectively available
     {
@@ -283,7 +283,7 @@ struct BitArray::BitArrayIterator {
     using reference         = typename OuterClass::reference;
 
     BitArrayIterator() = default;
-    inline explicit BitArrayIterator(const OuterClass *instance, uint32_t bit_index = 0)
+    inline explicit BitArrayIterator(const OuterClass *instance, uint64_t bit_index = 0)
             : m_instance{instance}, m_index{bit_index} {}
 
 

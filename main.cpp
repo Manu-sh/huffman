@@ -26,7 +26,6 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
     auto mode = argc > 1 ? DECOMPRESS : COMPRESS;
 
     if (mode == COMPRESS) { // compress a binary file
-
         auto str = stream_content(cin);
         Encoder encoder{str};
 
