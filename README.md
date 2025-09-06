@@ -82,6 +82,13 @@ uint8_t[??] bitstream;
 - https://www.math.unipd.it/~baldan/Alg2/Slide/Lezione2.pdf (italian)
 - https://www.youtube.com/playlist?list=PLU4IQLU9e_OrY8oASHx0u3IXAL9TOdidm
 
+##### Other interesting topic related to DEFLATE or LZW (notes 4 me)
+- https://create.stephan-brumme.com/length-limited-prefix-codes/#package-merge
+- https://experiencestack.co/length-limited-huffman-codes-21971f021d43
+- https://aniruddhadeb.com/articles/2024/package-merge/
+- https://en.wikipedia.org/wiki/Compress_(software)
+- https://it.wikipedia.org/wiki/Graphics_Interchange_Format
+
 ##### Special Thanks
 
 A special thanks to [Bill Bird](https://github.com/billbird) from the University of Victoria (Canada), 
