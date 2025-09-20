@@ -25,7 +25,8 @@ struct BitArray {
     static FORCED(inline) constexpr auto bytes_required(uint64_t bits) noexcept {
         //return (bits == 0) + ceil_div(bits, 8); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
         assert(bits);
-        return ceil_div(bits, 8);
+        //return ceil_div(bits, 8);
+        return ceil_div8(bits);
     }
 
     // effective_byte_size() -> return in which byte is stored the latest bit 0 if none

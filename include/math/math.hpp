@@ -28,6 +28,12 @@ static constexpr FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) noe
     return (num-1) / div + 1;
 }
 
+// ceil_div8(x) -> same of ceil_div(x, 8)
+static constexpr FORCED(inline) uint64_t ceil_div8(uint64_t num) {
+    return (num + 7) >> 3;
+}
+
+
 template <const bool use_pct = 1>
 static FORCED(inline) double compression_ratio(uint64_t compressed_len, uint64_t uncompressed_len) noexcept {
     static_assert(use_pct == 1, "not implemented");
