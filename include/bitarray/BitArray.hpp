@@ -23,7 +23,7 @@ struct BitArray {
 
     // es. 9 bit requires 2 byte -> byte_required(9) -> 2
     static FORCED(inline) constexpr auto bytes_required(uint64_t bits) noexcept {
-        //return bits == 0 ? 1 : ceil_div(bits, 8);
+        //return (bits == 0) + ceil_div(bits, 8); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
         assert(bits);
         return ceil_div(bits, 8);
     }
