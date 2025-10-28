@@ -6,13 +6,6 @@
 
 #include <common.hpp>
 
-
-template<typename T>
-static constexpr uint8_t msb(T number) requires std::is_integral_v<T> {
-    return number >> (sizeof(T) - 1);
-}
-
-
 // il logaritmo in base X di un argomento A si può calcolare
 // usando il logaritmo in base 10: log10(X) / log10(A)
 static double log_in_base(double base, double argument) {
