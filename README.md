@@ -1,4 +1,4 @@
-### Huffman (Work in progress)
+### Huffman
 ###### 
 
 Nice to have / Future or TODOs:
