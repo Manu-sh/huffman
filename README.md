@@ -76,6 +76,49 @@ uint8_t[??] bitstream;
 - The length of every symbol table entry must be > 0.
 
 
+### run test
+
+```
+mkdir -p build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j`nproc --all`
+cp ../test-hafe.sh
+
+# you have to check md5 with your eyes, see (*)below
+./test-hafe.sh
+```
+
+**(*)below**: md5 sum of original data (../data/vergine_delle_rocce.txt) and decompressed data (vergine_delle_rocce.txt) must be the same
+
+```bash
+...
+decompressing vergine_delle_rocce.txt.hafe -> vergine_delle_rocce.txt
+
+real	0m0,013s
+user	0m0,008s
+sys	0m0,004s
+a4288f761135779373b0d1b1747f6e47  vergine_delle_rocce.txt
+a4288f761135779373b0d1b1747f6e47  ../data/vergine_delle_rocce.txt
+
+-----------
+
+```
+
+usually output .hafe files are smaller (every test file should be smaller since are optimal tests). es:
+```
+compressing ../data/vergine_delle_rocce.txt vergine_delle_rocce.txt.hafe
+
+real	0m0,011s
+user	0m0,009s
+sys	0m0,002s
+
+352K	../data/vergine_delle_rocce.txt
+196K	vergine_delle_rocce.txt.hafe
+
+-----------
+```
+
 ##### Learning resources
 - https://huffman-coding-online.vercel.app
 - https://web.stanford.edu/class/archive/cs/cs106b/cs106b.1234/resources/huffman.html
