@@ -3,7 +3,7 @@
 #include <cassert>
 #include <common.hpp>
 
-struct __attribute__((__packed__)) BitArray8 {
+struct __attribute__((packed)) BitArray8 {
 
     //friend class BitArray;
 
