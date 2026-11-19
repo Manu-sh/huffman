@@ -354,14 +354,18 @@ FORCED(inline) BitArray & BitArray::operator+=(const BitArray &o) {
         auto sz = effective_byte_size(); // ATTENTION!!! this value can be 0, usually memory size is never 0 i dont wanna change the entire logic
         auto o_sz = o.effective_byte_size();
 
-        if (m_bit_capacity < sz + o_sz) m_vct.resize( sz + o_sz ); // 5+1 = 6
+        if (sz < sz + o_sz) m_vct.resize( sz + o_sz ); // 5+1 = 6
+        //m_vct.resize( sz + o_sz ); // 5+1 = 6
         assert(&(o.m_vct) != &(this->m_vct));  // non dovrebbe mai succedere, eventualmente se &o == this usare memmove()
+
+        assert(m_vct.size() >= sz + o_sz);
 
         void *dst = m_vct.data() + sz; // skip N bytes -> buf+5
         memcpy(dst, o.m_vct.data(), o_sz); // cpy(&buf[5], src, 1) -> this copy 1 byte starting from address 5 which is writeable because the size is 6
 
         this->m_bit_capacity = 8 * m_vct.size();
         this->m_bit_idx += o.m_bit_idx;
+
         return *this;
     }
 

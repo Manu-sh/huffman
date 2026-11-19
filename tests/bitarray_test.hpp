@@ -1,15 +1,13 @@
 #pragma once
+#include <cassert>
 #include <doctest/doctest.h>
 
 #include <bitarray/BitArray.hpp>
 #include <bitarray/BitArray8.hpp>
 
-DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <iostream>
 #include <string>
 #include <cstdint>
-#include <memory>
-DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 using namespace std;
 
@@ -340,6 +338,8 @@ TEST_CASE("testing concat bitarray::+=operator(const BitArray&)") {
 
         BitArray dst;
         dst += src;
+        //assert(dst.m_vct.size() >= 16);
+
         dst += src;
 
         REQUIRE(dst.bit_capacity() >= 33*2);

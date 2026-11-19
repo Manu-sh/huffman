@@ -9,11 +9,9 @@
 #include <decoder/Decoder.hpp>
 #include <bitarray/BitArray.hpp>
 
-DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <iostream>
 #include <string>
 #include <cstdint>
-DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
 
 #include "huffman_code_test.hpp"
 #include "bitarray_test.hpp"

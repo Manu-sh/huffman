@@ -47,8 +47,8 @@ target_compile_options(${PROJECT_NAME}
 )
 
 # yay -S --noconfirm doctest
-#include(CTest)
-#if(BUILD_TESTING)
-#    message("Config build type: ${CMAKE_BUILD_TYPE}")
-#    add_subdirectory(tests)
-#endif()
+include(CTest)
+if(BUILD_TESTING)
+    message("Config build type: ${CMAKE_BUILD_TYPE}")
+    add_subdirectory(tests)
+endif()

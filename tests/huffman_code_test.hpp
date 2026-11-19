@@ -12,7 +12,6 @@
 #include <decoder/Decoder.hpp>
 #include <endian/endianess.hpp>
 
-DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 #include <iostream>
 #include <string>
 #include <cstdint>
@@ -20,7 +19,7 @@ DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_BEGIN
 
 #include <ctime>
 #include <cstdlib>
-DOCTEST_MAKE_STD_HEADERS_CLEAN_FROM_WARNINGS_ON_WALL_END
+
 
 using namespace std;
 
