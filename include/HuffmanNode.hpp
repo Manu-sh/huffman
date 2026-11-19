@@ -5,8 +5,11 @@
 #include <memory>
 #include <format>
 
+struct HuffmanTree; // forward declaration
+
 struct HuffmanNode final {
 
+    friend class HuffmanTree;
     friend class SymbolTable;
 
     enum: uint8_t {

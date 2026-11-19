@@ -521,7 +521,7 @@ TEST_CASE("testing advance compare") {
 
             REQUIRE(bit_src.bit_length() == i+1);
             REQUIRE(bit_dst.bit_length() == i+1);
-            
+
             REQUIRE(bit_src.back() == 1);
             REQUIRE(bit_dst.back() == 1);
             REQUIRE(bit_src.back() == bit_dst.back());

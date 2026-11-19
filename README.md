@@ -83,7 +83,7 @@ mkdir -p build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j`nproc --all`
-cp ../test-hafe.sh
+cp ../test-hafe.sh .
 
 # you have to check md5 with your eyes, see (*)below
 ./test-hafe.sh

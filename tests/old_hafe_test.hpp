@@ -119,6 +119,8 @@ TEST_CASE("testing .hafe compress & decompress") {
 
         // compress
         std::string str = file_content(file_uncompressed);
+		REQUIRE(str.length() > 0);
+
         ShannonHistogram freq{(uint8_t *)str.data(), str.length()};
 
         auto tree = HuffmanTree(freq);

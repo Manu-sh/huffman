@@ -90,4 +90,13 @@ HuffmanTree::HuffmanTree(const Histogram &histogram) {
 
     this->m_root = pq.top();
 
+#if 1
+    // TODO: workaround
+    if (this->m_root->is_leaf()) {
+		gc.push_back(std::make_shared<HuffmanNode>(this->m_root->m_symbol, this->m_root->m_freq));
+        this->m_root->m_child[HuffmanNode::CHILD_LEFT] = gc.back().get(); // assign an arbitrary huffman_code: 0
+        this->m_root->m_symbol = this->m_root->m_freq = 0;
+    }
+#endif
+
 }
