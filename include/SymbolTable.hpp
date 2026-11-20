@@ -128,9 +128,6 @@ const HuffmanCode & SymbolTable::longest() const {
 
 
 
-
-
-#if 1
  HuffmanTree SymbolTable::to_huffman_tree() const {
 
      HuffmanTree tree;
@@ -171,4 +168,3 @@ const HuffmanCode & SymbolTable::longest() const {
 
     return tree;
 }
-#endif
