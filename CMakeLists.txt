@@ -4,8 +4,8 @@ project(huffman)
 set(CMAKE_CXX_STANDARD 20)
 
 if(NOT CMAKE_BUILD_TYPE)
-	#set(CMAKE_BUILD_TYPE Release)
-    set(CMAKE_BUILD_TYPE Debug)
+	  set(CMAKE_BUILD_TYPE Release)
+    #set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 #set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
@@ -24,31 +24,44 @@ list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 
 add_executable(${PROJECT_NAME} main.cpp)
 
-#target_link_libraries(${PROJECT_NAME} -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable)
+
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+if(ENABLE_ASAN)
+    # Flag per il compilatore
+    target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable)
+
+    # Flag per il linker
+    target_link_options(${PROJECT_NAME} PRIVATE -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable)
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INC_PATH})
-target_compile_options(${PROJECT_NAME}
-    PRIVATE
-        -pedantic
-        -Wall -Wextra -Wno-unused-function -pipe
-        #-D_FORTIFY_SOURCE=2
-        #-ftrapv
-        #-z,stack-size=786433
-        #-fstack-protector-all -fstack-protector-strong
-        -fno-builtin-memcpy
-        #-fno-tree-builtin-call-dce
 
-        #-fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable
-        #-g3 -fno-omit-frame-pointer
-        #-O0
-        -DNDebug
-        -Ofast -ffast-math -funroll-loops -march=native -mtune=native
-        -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
-)
 
-# yay -S --noconfirm doctest
-include(CTest)
-if(BUILD_TESTING)
-    message("Config build type: ${CMAKE_BUILD_TYPE}")
-    add_subdirectory(tests)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+  target_compile_options(${PROJECT_NAME}
+      PRIVATE
+          -pedantic -Wall -Wextra -Wno-unused-function -pipe
+          -fno-builtin-memcpy
+          -g3 -fno-omit-frame-pointer
+          -O0
+          -DDebug
+  )
+
+  # yay -S --noconfirm doctest
+  include(CTest)
+  if(BUILD_TESTING)
+      message("Config build type: ${CMAKE_BUILD_TYPE}")
+      add_subdirectory(tests)
+  endif()
+
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+  target_compile_options(${PROJECT_NAME}
+      PRIVATE
+          -pedantic -Wall -Wextra -Wno-unused-function -pipe
+          -fno-builtin-memcpy
+          -DNDebug
+          -Ofast -ffast-math -funroll-loops -march=native -mtune=native
+          -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
+  )
 endif()

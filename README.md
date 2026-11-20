@@ -89,6 +89,8 @@ cp ../test-hafe.sh .
 ./test-hafe.sh
 ```
 
+otherwise to build and run all coverage tests install `doctest` framework, then: `cmake -DCMAKE_BUILD_TYPE=Debug ..` then `cd build/tests && ./huffman_test`
+
 **(*)below**: md5 sum of original data (../data/vergine_delle_rocce.txt) and decompressed data (vergine_delle_rocce.txt) must be the same
 
 ```bash
