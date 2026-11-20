@@ -16,6 +16,7 @@ struct Decoder {
 
 
     // uint64_t steps = huffman_tree_path2symbol(huffman_tree, vbit, vbit_idx, &symbol)
+    #if 0
     static uint64_t decode_next_symbol(const HuffmanTree &tree, const BitArray &encoded,
         const uint64_t from_index, uint8_t *symbol) {
 
@@ -44,6 +45,34 @@ struct Decoder {
 
         return std::min(bit_idx, blen) - from_index;
     }
+    #endif
+
+    static uint64_t decode_next_symbol(const HuffmanTree &tree, const BitArray &encoded,
+        const uint64_t from_index, uint8_t *symbol) {
+
+        const uint64_t blen = encoded.bit_length();
+        const HuffmanNode *cur_node = tree.root();
+        uint64_t bit_idx;
+
+        if (from_index >= blen || !cur_node)
+            return 0;
+
+        for (bit_idx = from_index; bit_idx < blen; ++bit_idx) {
+
+            if (cur_node->is_leaf()) { // symbol decoded
+                *symbol = cur_node->symbol();
+                return bit_idx - from_index;
+            }
+
+            const bool direction = encoded[bit_idx]; // CHILD_LEFT=0, CHILD_RIGHT=1
+            if (!(cur_node = cur_node->m_child[direction]))
+                return 0; // invalid path/tree
+        }
+
+        *symbol = cur_node->symbol();
+        return bit_idx - from_index; //return std::min(bit_idx, blen) - from_index;
+    }
+
 
     static std::shared_ptr<std::string> decode(const SymbolTable &symbol_table, const BitArray &encoded) {
 
