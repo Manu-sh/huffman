@@ -32,7 +32,7 @@ struct HuffmanNode final {
 
 
 
-    inline explicit HuffmanNode(uint8_t symbol, uint32_t frequency) noexcept: m_child{} { // construct an huffman node as leaf
+    inline explicit HuffmanNode(uint8_t symbol = 0, uint32_t frequency = 0) noexcept: m_child{} { // construct an huffman node as leaf
         m_symbol = symbol;
         m_freq   = frequency;
     }

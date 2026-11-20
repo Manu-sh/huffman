@@ -132,7 +132,7 @@ const HuffmanCode & SymbolTable::longest() const {
 
      HuffmanTree tree;
 
-     tree.gc.push_back(std::make_shared<HuffmanNode>(0, 0));
+     tree.gc.push_back(std::make_shared<HuffmanNode>());
      tree.m_root = tree.gc.back().get();
 
     for (uint_fast16_t symbol = 0; symbol < SymbolTable::MAX_SYMBOLS; ++symbol) {
@@ -154,7 +154,7 @@ const HuffmanCode & SymbolTable::longest() const {
             }
 
             // otherwise place a new node
-            tree.gc.push_back(std::make_shared<HuffmanNode>(0, 0));
+            tree.gc.push_back(std::make_shared<HuffmanNode>());
             cur_node = cur_node->m_child[direction] = tree.gc.back().get();
         }
 
