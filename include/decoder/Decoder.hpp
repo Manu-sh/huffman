@@ -1,6 +1,7 @@
 #pragma once
 #include <istream>
 #include <cstdint>
+#include <cassert>
 
 #include <hafe_file_format/Hafe.hpp>
 #include <ShannonHistogram.hpp>
@@ -31,11 +32,12 @@ struct Decoder {
             ++bit_idx;
         }
 
+        assert(bit_idx <= blen);
         assert(cur_node);
         assert(cur_node != tree.root());
 
         *symbol = cur_node->symbol();
-        return bit_idx - from_index;
+        return bit_idx - from_index; //return std::min(bit_idx, blen) - from_index;
     }
 
 
