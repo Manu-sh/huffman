@@ -40,7 +40,7 @@ TEST_CASE("testing huffman on strings") {
         auto shp_decoded = Decoder::decode(st, *shp_encoded);
         REQUIRE(str == *shp_decoded);
 
-        const HuffmanTree &tree_clone = SymbolTable::to_huffman_tree(st);
+        const HuffmanTree &tree_clone = st.to_huffman_tree();
         auto shp_decoded2 = Decoder::decode(tree_clone, *shp_encoded);
         REQUIRE(str == *shp_decoded2);
     };

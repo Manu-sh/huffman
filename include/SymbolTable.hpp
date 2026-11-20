@@ -23,8 +23,6 @@ struct SymbolTable {
 
     static constexpr uint16_t MAX_SYMBOLS = 256;
 
-    static HuffmanTree to_huffman_tree(const SymbolTable &symbol_table);
-
     protected:
         static std::shared_ptr<std::vector<HuffmanCode>> build_symbol_table(const HuffmanNode *root);
 
@@ -50,6 +48,8 @@ struct SymbolTable {
         InverseSymbolTable inverse_symbol_table() const {
             return InverseSymbolTable{m_self};
         }
+
+        HuffmanTree to_huffman_tree() const;
 
     protected:
         std::shared_ptr<std::vector<HuffmanCode>> m_self;
@@ -131,7 +131,7 @@ const HuffmanCode & SymbolTable::longest() const {
 
 
 #if 1
- HuffmanTree SymbolTable::to_huffman_tree(const SymbolTable &symbol_table) {
+ HuffmanTree SymbolTable::to_huffman_tree() const {
 
      HuffmanTree tree;
 
@@ -140,7 +140,7 @@ const HuffmanCode & SymbolTable::longest() const {
 
     for (uint_fast16_t symbol = 0; symbol < SymbolTable::MAX_SYMBOLS; ++symbol) {
 
-        const HuffmanCode &path = (*symbol_table.m_self)[symbol];
+        const HuffmanCode &path = (*this->m_self)[symbol];
         if (path.is_invalid())
             continue;
 

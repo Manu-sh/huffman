@@ -86,7 +86,7 @@ struct Decoder {
             return;
         }
 
-        const HuffmanTree &tree = SymbolTable::to_huffman_tree(symbol_table);
+        const HuffmanTree &tree = symbol_table.to_huffman_tree();
         this->m_str = Decoder::decode(tree, m_bitstream.borrow());
     }
 

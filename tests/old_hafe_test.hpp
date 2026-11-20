@@ -163,7 +163,7 @@ TEST_CASE("testing .hafe compress & decompress") {
         auto shp_str = Decoder::decode(st, bt.borrow());
         REQUIRE(*shp_str == file_content(file_uncompressed));
 
-        const HuffmanTree &tree_clone = SymbolTable::to_huffman_tree(st);
+        const HuffmanTree &tree_clone = st.to_huffman_tree();
         auto shp_str2 = Decoder::decode(tree_clone, bt.borrow());
         REQUIRE(*shp_str2 == file_content(file_uncompressed));
     };
@@ -217,7 +217,7 @@ TEST_CASE("testing .hafe compress & decompress") {
             auto shp_str = Decoder::decode(st, bt.borrow());
             REQUIRE(*shp_str == sentence);
 
-            const HuffmanTree &tree_clone = SymbolTable::to_huffman_tree(st);
+            const HuffmanTree &tree_clone = st.to_huffman_tree();
             auto shp_str2 = Decoder::decode(tree_clone, bt.borrow());
             REQUIRE(*shp_str2 == sentence);
         }
