@@ -40,23 +40,6 @@ struct Decoder {
     }
 #endif
 
-    static std::shared_ptr<std::string> decode_fast(const HuffmanTree &tree, const BitArray &encoded) {
-
-        std::ostringstream decoded;
-
-        for (uint64_t i = 0; i < encoded.bit_length();) {
-            uint8_t symbol;
-            uint64_t steps = huffman_tree_path2symbol(tree, encoded, i, &symbol);
-            //printf("tree clone -> decoded sym: %c, steps: %zu\n", symbol, steps);
-
-            decoded.put(symbol);
-            i += steps;
-        }
-
-        return std::make_shared<std::string>( std::move(decoded.str()) );
-    }
-
-
     static std::shared_ptr<std::string> decode(const SymbolTable &symbol_table, const BitArray &encoded) {
 
         const InverseSymbolTable &huffman_codes = symbol_table.inverse_symbol_table();
@@ -78,16 +61,36 @@ struct Decoder {
         return std::make_shared<std::string>( std::move(decoded.str()) );
     }
 
-    explicit Decoder(const SymbolTable &symbol_table, const BitStream &encoded)
-        : m_symbol_table{symbol_table}, m_bitstream{encoded} {
 
-        //this->m_str  = Decoder::decode(m_symbol_table, m_bitstream.borrow());
+    static std::shared_ptr<std::string> decode(const HuffmanTree &tree, const BitArray &encoded) {
 
-        HuffmanTree tree = SymbolTable::to_huffman_tree(symbol_table);
-        this->m_str = Decoder::decode_fast(tree, m_bitstream.borrow());
+        std::ostringstream decoded;
+
+        for (uint64_t i = 0; i < encoded.bit_length();) {
+            uint8_t symbol;
+            uint64_t steps = huffman_tree_path2symbol(tree, encoded, i, &symbol);
+            //printf("tree clone -> decoded sym: %c, steps: %zu\n", symbol, steps);
+
+            decoded.put(symbol);
+            i += steps;
+        }
+
+        return std::make_shared<std::string>( std::move(decoded.str()) );
     }
 
-    explicit Decoder(const Hafe &to_decode): Decoder{to_decode.symbol_table(), to_decode.bitstream()} {}
+    explicit Decoder(const SymbolTable &symbol_table, const BitStream &encoded, bool use_tree)
+        : m_symbol_table{symbol_table}, m_bitstream{encoded} {
+
+        if (!use_tree) {
+            this->m_str  = Decoder::decode(m_symbol_table, m_bitstream.borrow());
+            return;
+        }
+
+        const HuffmanTree &tree = SymbolTable::to_huffman_tree(symbol_table);
+        this->m_str = Decoder::decode(tree, m_bitstream.borrow());
+    }
+
+    explicit Decoder(const Hafe &to_decode, bool use_tree): Decoder{to_decode.symbol_table(), to_decode.bitstream(), use_tree} {}
 
     inline const auto & bitstream()         const { return m_bitstream;    }
     inline const auto & symbol_table()      const { return m_symbol_table; }

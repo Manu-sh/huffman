@@ -1,9 +1,7 @@
-#include "include/HuffmanTree.hpp"
 #include <cstdint>
 #include <iostream>
 #include <cassert>
 
-#include <HuffmanTree.hpp>
 #include <Histogram.hpp>
 #include <ShannonHistogram.hpp>
 #include <SymbolTable.hpp>
@@ -32,7 +30,7 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
         Encoder encoder{str};
 
         // const auto &freq  = encoder.shannon_histogram();
-        // auto symbol_table = encoder.symbol_table();
+        //auto symbol_table = encoder.symbol_table();
         //assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
         Hafe hafe = encoder.hafe();
@@ -41,13 +39,15 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
     }
 
 
+    const bool use_tree = true;
     Hafe hafe{cin};
-    Decoder decoder{hafe};
+    Decoder decoder{hafe,use_tree};
+
 
     //const auto &symbol_table = decoder.symbol_table();
     //assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
-    const auto &symbol_table = decoder.symbol_table();
+
     cout.write((char *)decoder.str().data(), decoder.str().length());
 
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include "bitarray/BitArray.hpp"
 #include <memory>
 #include <vector>
 

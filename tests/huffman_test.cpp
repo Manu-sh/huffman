@@ -39,6 +39,10 @@ TEST_CASE("testing huffman on strings") {
         auto shp_encoded = Encoder::encode(st, str);
         auto shp_decoded = Decoder::decode(st, *shp_encoded);
         REQUIRE(str == *shp_decoded);
+
+        const HuffmanTree &tree_clone = SymbolTable::to_huffman_tree(st);
+        auto shp_decoded2 = Decoder::decode(tree_clone, *shp_encoded);
+        REQUIRE(str == *shp_decoded2);
     };
 
     try_decode("il mio angolo di cielo e un triangolo di pelo");

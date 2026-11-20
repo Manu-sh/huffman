@@ -162,6 +162,10 @@ TEST_CASE("testing .hafe compress & decompress") {
         //REQUIRE(shp_bitstream->effective_byte_size() == 331643); // numfmt --to=iec 331643 -> 324K solo per divina commedia.txt
         auto shp_str = Decoder::decode(st, bt.borrow());
         REQUIRE(*shp_str == file_content(file_uncompressed));
+
+        const HuffmanTree &tree_clone = SymbolTable::to_huffman_tree(st);
+        auto shp_str2 = Decoder::decode(tree_clone, bt.borrow());
+        REQUIRE(*shp_str2 == file_content(file_uncompressed));
     };
 
     // "../../data/divina_commedia.txt"
@@ -212,6 +216,10 @@ TEST_CASE("testing .hafe compress & decompress") {
 
             auto shp_str = Decoder::decode(st, bt.borrow());
             REQUIRE(*shp_str == sentence);
+
+            const HuffmanTree &tree_clone = SymbolTable::to_huffman_tree(st);
+            auto shp_str2 = Decoder::decode(tree_clone, bt.borrow());
+            REQUIRE(*shp_str2 == sentence);
         }
 
     };
