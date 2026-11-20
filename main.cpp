@@ -1,3 +1,4 @@
+#include "include/HuffmanTree.hpp"
 #include <cstdint>
 #include <iostream>
 #include <cassert>
@@ -16,6 +17,7 @@
 
 using namespace std;
 
+
 int main(int argc, [[maybe_unused]] char *argv[]) {
 
     enum  {
@@ -30,7 +32,7 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
         Encoder encoder{str};
 
         // const auto &freq  = encoder.shannon_histogram();
-        //auto symbol_table = encoder.symbol_table();
+        // auto symbol_table = encoder.symbol_table();
         //assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
 
         Hafe hafe = encoder.hafe();
@@ -44,6 +46,8 @@ int main(int argc, [[maybe_unused]] char *argv[]) {
 
     //const auto &symbol_table = decoder.symbol_table();
     //assert(symbol_table.longest().bit_length() < HuffmanCode::MAX_LENGTH);
+
+    const auto &symbol_table = decoder.symbol_table();
     cout.write((char *)decoder.str().data(), decoder.str().length());
 
 }

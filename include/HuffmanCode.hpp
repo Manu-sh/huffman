@@ -13,6 +13,10 @@ struct HuffmanCode: BitArray {
 	//HuffmanCode(): BitArray{48} {}
 	HuffmanCode(): BitArray{HuffmanCode::MAX_LENGTH} {}
 
+	bool is_invalid() const {
+	    return this->empty() || this->bit_length() > HuffmanCode::MAX_LENGTH;
+	}
+
     HuffmanCode(BitArray &&b) {
         static_assert(sizeof(HuffmanCode) == sizeof(BitArray), "update if the memory layout differs");
         *((BitArray *)this) = std::move(b); // update if the memory layout differs
@@ -87,4 +91,3 @@ just assume the maximum length it's sizeof(uint8_t)-1.
  As a consequence, the resulting tree will be the most unbalanced one, being a full binary tree."
 
 */
-

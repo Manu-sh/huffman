@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -11,6 +12,7 @@
 struct HuffmanTree {
 
     friend class SymbolTable;
+    friend class Decoder;
 
     HuffmanTree() = default;
     explicit HuffmanTree(const Histogram &freq); // standard huffman tree

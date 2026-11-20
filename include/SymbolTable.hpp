@@ -1,10 +1,12 @@
 #pragma once
+#include "bitarray/BitArray.hpp"
 #include <memory>
 #include <vector>
 
 #include <HuffmanTree.hpp>
 #include <InverseSymbolTable.hpp>
 #include <HuffmanCode.hpp>
+#include <HuffmanNode.hpp>
 
 #include <string>
 #include <forward_list>
@@ -21,6 +23,8 @@
 struct SymbolTable {
 
     static constexpr uint16_t MAX_SYMBOLS = 256;
+
+    static HuffmanTree to_huffman_tree(const SymbolTable &symbol_table);
 
     protected:
         static std::shared_ptr<std::vector<HuffmanCode>> build_symbol_table(const HuffmanNode *root);
@@ -122,3 +126,50 @@ const HuffmanCode & SymbolTable::longest() const {
 
     return it == symbol_table.end() ? *symbol_table.begin() : *it;
 }
+
+
+
+
+
+#if 1
+ HuffmanTree SymbolTable::to_huffman_tree(const SymbolTable &symbol_table) {
+
+     HuffmanTree tree;
+
+     tree.gc.push_back(std::make_shared<HuffmanNode>(0, 0));
+     tree.m_root = tree.gc.back().get();
+
+    for (uint_fast16_t symbol = 0; symbol < SymbolTable::MAX_SYMBOLS; ++symbol) {
+
+        const HuffmanCode &path = (*symbol_table.m_self)[symbol];
+        if (path.is_invalid())
+            continue;
+
+        // mkpath() TODO: FUZZY TEST
+        HuffmanNode *cur_node = (HuffmanNode *)tree.root();
+        for (uint16_t i = 0; i < path.bit_length(); ++i) {
+
+            const bool direction = path[i]; // CHILD_LEFT=0, CHILD_RIGHT=1
+
+            // follow the direction if the node already exist
+            if (cur_node->m_child[direction]) {
+                cur_node = cur_node->m_child[direction];
+                continue;
+            }
+
+            // otherwise place a new node
+            tree.gc.push_back(std::make_shared<HuffmanNode>(0, 0));
+            cur_node = cur_node->m_child[direction] = tree.gc.back().get();
+        }
+
+        // at the end of the loop cur_node is pointing to the root or another leaf, every leaf has the symbol
+        assert(cur_node);
+        assert(cur_node->is_leaf());
+
+        cur_node->m_symbol = symbol;
+        cur_node->m_freq   = 1; // a dummy value, we don't have any information about the frequencies stored in the original treee
+    }
+
+    return tree;
+}
+#endif

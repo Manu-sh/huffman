@@ -9,6 +9,7 @@ struct HuffmanTree; // forward declaration
 
 struct HuffmanNode final {
 
+    friend class Decoder;
     friend class HuffmanTree;
     friend class SymbolTable;
 
@@ -56,6 +57,7 @@ struct HuffmanNode final {
 
     inline bool  is_leaf() const noexcept { return m_child[CHILD_LEFT] == m_child[CHILD_RIGHT]; } // nullptr == nullptr
     inline uint64_t freq() const noexcept { return m_freq; }
+    inline uint8_t symbol() const noexcept { return m_symbol; }
 
 
     std::string name() const {
