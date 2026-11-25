@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-project(huffman)
+project(huffman CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -36,16 +36,13 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INC_PATH})
 
-
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
   target_compile_options(${PROJECT_NAME}
       PRIVATE
-          -pedantic -Wall -Wextra -Wno-unused-function -pipe
-          -fno-builtin-memcpy
-          -g3 -fno-omit-frame-pointer
-          -O0
-          -DDEBUG
+          -std=c++20 -pedantic -Wall -Wextra -Wno-unused-function -pipe
+          -fno-builtin-memcpy -fno-omit-frame-pointer
+          -O0 -DDEBUG -g3
   )
 
   # yay -S --noconfirm doctest
@@ -58,10 +55,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   target_compile_options(${PROJECT_NAME}
       PRIVATE
-          -pedantic -Wall -Wextra -Wno-unused-function -pipe
-          -fno-builtin-memcpy
-          -DNDEBUG
+          -std=c++20 -pedantic -Wall -Wextra -Wno-unused-function -pipe
           -Ofast -ffast-math -funroll-loops -march=native -mtune=native
           -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
+          -fno-builtin-memcpy -DNDEBUG
   )
 endif()
