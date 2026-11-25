@@ -45,7 +45,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
           -fno-builtin-memcpy
           -g3 -fno-omit-frame-pointer
           -O0
-          -DDebug
+          -DDEBUG
   )
 
   # yay -S --noconfirm doctest
@@ -60,7 +60,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
       PRIVATE
           -pedantic -Wall -Wextra -Wno-unused-function -pipe
           -fno-builtin-memcpy
-          -DNDebug
+          -DNDEBUG
           -Ofast -ffast-math -funroll-loops -march=native -mtune=native
           -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
   )
