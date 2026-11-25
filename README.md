@@ -31,7 +31,7 @@ All integers in **Little Endian**:
 | 4        | 16 byte    | reserved           | 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D 1D | reserved bytes |
 | 20       | 4 byte    | symbol table length | 3C 00 00 00                                     | length in bytes of symbol table 32 bit unsigned integer in little endian |
 | 24       | variable  | symbol table        | -                                               | see [here](#symbol-table-on-disk) |
-| variable | 8 byte    | bitstream length    | -                                               | the length of bitstream **in bits** except padding bits if none, 64 bit unsigned integer in little endian ~~uint8_t last_byte_garbage_bits stream_size % 2**8, a compact way to express bitstream length since can be very long and it contains garbage at the end in the last byte (padding bits).~~ |
+| variable | 8 byte    | bitstream length    | -                                               | the length of bitstream **in bits** except padding bits if any, 64 bit unsigned integer in little endian ~~uint8_t last_byte_garbage_bits stream_size % 2**8, a compact way to express bitstream length since can be very long and it contains garbage at the end in the last byte (padding bits).~~ |
 | variable | variable  | bitstream           | -                                               | the compressed bitstream |
 
 

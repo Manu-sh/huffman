@@ -150,7 +150,7 @@ void Hafe::write(std::ostream &os) const {
 
     // write the bitstream size in bits
     if (!os.write((char *)&m_bitstream_bitsz, sizeof m_bitstream_bitsz))
-        throw std::runtime_error{"error writing reserved bytes"};
+        throw std::runtime_error{"error writing the length in bits of bitstream"};
 
     if (!os.write((char *)m_bit_stream.borrow().bitstream(), m_bit_stream.borrow().effective_byte_size()))
         throw std::runtime_error{"error writing the bitstream"};
